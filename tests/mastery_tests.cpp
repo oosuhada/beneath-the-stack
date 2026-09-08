@@ -8,6 +8,8 @@
 #include "bts/data_structures.hpp"
 #include "bts/embedded.hpp"
 #include "bts/http.hpp"
+#include "bts/scheduler.hpp"
+#include "bts/toy_filesystem.hpp"
 #include "bts/toy_storage.hpp"
 
 namespace {
@@ -253,6 +255,38 @@ void test_embedded_simulator() {
       "embedded controller rejects inverted hysteresis thresholds");
 }
 
+void test_scheduler_simulator() {
+  const std::vector<bts::SchedulerJob> jobs{
+      {0, 0, 20, 5}, {1, 0, 2, 0}, {2, 1, 2, 0}, {3, 2, 2, 0}};
+  const auto fifo = bts::simulate_fifo(jobs, 10);
+  const auto round_robin = bts::simulate_round_robin(jobs, 4, 10);
+  const auto priority = bts::simulate_priority_non_preemptive(jobs, 10);
+  const auto sjf = bts::simulate_shortest_job_first(jobs, 10);
+  check(fifo.max_waiting > round_robin.max_waiting,
+        "round robin can reduce the convoy max wait for short jobs in the toy scheduler");
+  check(priority.jobs[0].waiting > 0,
+        "priority scheduling can delay a long low-priority job even when it arrived first");
+  check(sjf.mean_turnaround <= fifo.mean_turnaround,
+        "shortest-job-first improves mean turnaround for the toy convoy fixture");
+}
+
+void test_toy_filesystem() {
+  bts::ToyFileSystem fs;
+  fs.mkdir("/var");
+  fs.mkdir("/var/log");
+  fs.write_file("/var/log/app.txt", "directory entries resolve to inode-like metadata and blocks");
+  fs.link_file("/var/log/app.txt", "/var/log/app.link");
+  const auto left = fs.stat("/var/log/app.txt");
+  const auto right = fs.stat("/var/log/app.link");
+  check(left.inode == right.inode && left.reference_count == 2,
+        "toy hard link gives two directory entries to the same inode-like object");
+  check(
+      left.block_count > 1 && fs.read_file("/var/log/app.link") == fs.read_file("/var/log/app.txt"),
+      "toy filesystem reads file content through fixed-size blocks regardless of path alias");
+  check_throws<std::invalid_argument>([&] { (void)fs.lookup("/var/../etc/passwd"); },
+                                      "toy filesystem rejects traversal path components");
+}
+
 }  // namespace
 
 int main() {
@@ -263,6 +297,8 @@ int main() {
   test_allocator();
   test_toy_storage();
   test_embedded_simulator();
+  test_scheduler_simulator();
+  test_toy_filesystem();
   if (failures != 0) {
     std::cerr << failures << " mastery test(s) failed\n";
     return 1;

@@ -51,9 +51,23 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
             "algorithm_defense_lab": ["--size", "20000", "--fib", "24", "--warmup", "1", "--repetitions", "2"],
             "memory_lab": ["--size", "50000", "--warmup", "1", "--repetitions", "3"],
             "process_lab": ["--warmup", "0", "--repetitions", "3"],
+            "os_boundary_lab": [
+                "--switch-rounds",
+                "150",
+                "--io-bytes",
+                "65536",
+                "--cow-mib",
+                "4",
+                "--warmup",
+                "0",
+                "--repetitions",
+                "2",
+            ],
             "vm_lab": ["--mib", "8", "--warmup", "0", "--repetitions", "2"],
+            "scheduler_lab": ["--quantum", "5", "--warmup", "1", "--repetitions", "2"],
             "storage_lab": ["--rows", "512", "--queries", "40", "--warmup", "1", "--repetitions", "2"],
             "allocator_lab": ["--operations", "1500", "--warmup", "1", "--repetitions", "2"],
+            "toy_filesystem_lab": ["--warmup", "1", "--repetitions", "2"],
             "embedded_lab": ["--warmup", "1", "--repetitions", "3"],
         }
     return {
@@ -67,9 +81,12 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
         "algorithm_defense_lab": [],
         "memory_lab": [],
         "process_lab": [],
+        "os_boundary_lab": [],
         "vm_lab": [],
+        "scheduler_lab": [],
         "storage_lab": [],
         "allocator_lab": [],
+        "toy_filesystem_lab": [],
         "embedded_lab": [],
     }
 

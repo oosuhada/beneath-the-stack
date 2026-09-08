@@ -9,6 +9,7 @@
     "5": "Applied to Real Project"
   },
   "rule": "Levels are cumulative. Level 5 requires evidence in a real repository outside beneath-the-stack; a toy application inside this repository is not sufficient.",
+  "os_level_5_rule": "For OS topics, Level 5 also requires at least four of: source-read, implemented, broken intentionally, debugged/traced, benchmarked, applied, explained.",
   "domains": [
     {
       "name": "Data Structures",
@@ -46,12 +47,15 @@
     {
       "name": "Operating Systems",
       "topics": [
-        {"topic": "process / fork isolation", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/notebook/2026-09-08-os-process-fd-pipe.md", "docs/interview/process-fd.md", "docs/source-reading/xv6-process-fd-vm.md"]},
-        {"topic": "file descriptor / dup shared offset", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/notebook/2026-09-08-os-process-fd-pipe.md", "docs/interview/process-fd.md", "docs/source-reading/xv6-process-fd-vm.md"]},
-        {"topic": "syscall boundary", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/interview/process-fd.md", "docs/xv6-bridge.md"]},
-        {"topic": "virtual memory / page table", "level": 4, "artifacts": ["labs/virtual_memory/main.cpp", "docs/notebook/2026-09-08-os-process-fd-pipe.md", "docs/source-reading/xv6-process-fd-vm.md", "evidence/v0.3-macbook-air.json"]},
-        {"topic": "context switch / scheduler", "level": 1, "artifacts": ["docs/xv6-bridge.md", "docs/ROADMAP.md"]},
-        {"topic": "pipe", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/notebook/2026-09-08-os-process-fd-pipe.md", "docs/source-reading/xv6-process-fd-vm.md"]}
+        {"topic": "process / fork isolation", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "labs/os_boundary/main.cpp", "docs/notebook/2026-09-08-os-kernel-boundary.md", "docs/interview/process-fd.md", "docs/source-reading/xv6-scheduler.md", "docs/source-reading/xv6-virtual-memory.md"]},
+        {"topic": "file descriptor identity / shared open file object", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "labs/os_boundary/main.cpp", "docs/notebook/2026-09-08-os-kernel-boundary.md", "docs/source-reading/xv6-syscall-path.md", "docs/source-reading/xv6-filesystem.md"]},
+        {"topic": "syscall dispatch boundary", "level": 4, "artifacts": ["labs/os_boundary/main.cpp", "docs/source-reading/xv6-syscall-path.md", "docs/debugger-assembly.md", "evidence/debugger/v0.4-sample-os-boundary.txt"]},
+        {"topic": "virtual memory / page table", "level": 4, "artifacts": ["labs/virtual_memory/main.cpp", "labs/os_boundary/main.cpp", "docs/source-reading/xv6-virtual-memory.md", "docs/notebook/2026-09-08-os-kernel-boundary.md", "evidence/v0.3-macbook-air.json"]},
+        {"topic": "copy-on-write observation", "level": 4, "artifacts": ["labs/os_boundary/main.cpp", "docs/source-reading/xv6-virtual-memory.md", "docs/notebook/2026-09-08-os-kernel-boundary.md"]},
+        {"topic": "context switch / scheduler", "level": 4, "artifacts": ["include/bts/scheduler.hpp", "labs/scheduler/main.cpp", "labs/os_boundary/main.cpp", "tests/mastery_tests.cpp", "docs/source-reading/xv6-scheduler.md", "evidence/debugger/v0.4-sample-os-boundary.txt"]},
+        {"topic": "pipe / blocking IPC", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "labs/os_boundary/main.cpp", "docs/notebook/2026-09-08-os-process-fd-pipe.md", "docs/source-reading/xv6-syscall-path.md"]},
+        {"topic": "filesystem path / inode / block model", "level": 4, "artifacts": ["include/bts/toy_filesystem.hpp", "labs/toy_filesystem/main.cpp", "tests/mastery_tests.cpp", "docs/source-reading/xv6-filesystem.md", "docs/adr/ADR-010-toy-filesystem-inode-model.md"]},
+        {"topic": "file durability / fsync boundary", "level": 5, "artifacts": ["labs/os_boundary/main.cpp", "docs/source-reading/xv6-filesystem.md", "docs/adr/ADR-009-durability-boundary-fsync.md", "https://github.com/oosuhada/browser-reliability-runtime/blob/main/src/local-llm/queue.ts", "https://github.com/oosuhada/memory-atlas-server/blob/main/src/MessageHistory.cpp"]}
       ]
     },
     {

@@ -63,6 +63,36 @@ New v0.3 evidence lives below the README rather than inside marketing copy:
 - `tests/differential_tests.cpp` compares custom heap/hash/B+tree behavior against standard-library
   references and fuzzes allocator invariants.
 
+## v0.4 — user-space calls meeting kernel-facing behavior
+
+v0.4 narrows the project around OS internals. The goal is not to say “I studied operating systems,”
+but to trace what happens when a user-space program crosses into kernel-maintained abstractions.
+
+```text
+user-space call
+  -> libc / syscall boundary
+  -> process descriptor table or VM mapping
+  -> kernel object model from xv6 source
+  -> observable POSIX behavior
+```
+
+New v0.4 evidence:
+
+- `labs/os_boundary/main.cpp` observes fd identity, COW-style fork divergence, read-vs-mmap access,
+  `write+close` vs `write+fsync+close`, and thread/process context-switch proxies.
+- `labs/scheduler/main.cpp` compares FIFO, round-robin, non-preemptive priority and
+  shortest-job-first on the same convoy workload.
+- `labs/toy_filesystem/main.cpp` models `path -> directory entry -> inode-like metadata -> blocks`.
+- [`docs/source-reading/xv6-syscall-path.md`](docs/source-reading/xv6-syscall-path.md),
+  [`xv6-scheduler.md`](docs/source-reading/xv6-scheduler.md),
+  [`xv6-virtual-memory.md`](docs/source-reading/xv6-virtual-memory.md) and
+  [`xv6-filesystem.md`](docs/source-reading/xv6-filesystem.md) trace only the xv6 files/functions
+  needed for the selected questions.
+- [`docs/notebook/2026-09-08-os-kernel-boundary.md`](docs/notebook/2026-09-08-os-kernel-boundary.md)
+  records wrong predictions and implementation bugs instead of hiding them.
+- [`docs/debugger-assembly.md`](docs/debugger-assembly.md) records the LLDB limitation, `sample`
+  trace and `-O0`/`-O2` assembly bridge.
+
 ## v0.2 — from labs to an evidence graph
 
 v0.1 established six executable experiments. v0.2 keeps those and adds the missing bridges between
@@ -98,6 +128,8 @@ include/bts/
 ├── bplus_tree.hpp       B+ tree internal/leaf split · linked leaves
 ├── toy_storage.hpp      fixed rows · 4 KiB pager · persisted B+tree locations
 ├── allocator.hpp        bump allocator · free list · split · coalescing · fragmentation stats
+├── scheduler.hpp        FIFO · round-robin · priority · SJF toy scheduler metrics
+├── toy_filesystem.hpp   directory entries · inode-like metadata · fixed-size blocks
 ├── embedded.hpp         HAL boundary · simulated output · thermal state machine
 └── benchmark.hpp        warm-up · repeated samples · p50/p95 · mean/stddev
 ```
@@ -106,7 +138,7 @@ No third-party C++ data-structure or benchmark framework is required for these l
 
 ## Executable laboratories
 
-Fourteen binaries emit machine-readable JSON. `tools/run_labs.py` only orchestrates them; it does not
+Seventeen binaries emit machine-readable JSON. `tools/run_labs.py` only orchestrates them; it does not
 manufacture algorithm results.
 
 ```text
@@ -120,9 +152,12 @@ data-structures     array/list/BST/trie/union-find behavior
 algorithm-defense   wrong algorithm choices and measured selection reasoning
 memory-locality     contiguous vs pointer-chasing memory access
 process-fd          fork/process isolation/syscall/file-descriptor semantics
+os-boundary         fd identity · COW · context switch proxy · fsync · read vs mmap
 virtual-memory      mmap reservation · page touch · mapped file · guard-page signal
+scheduler-internals FIFO/RR/priority/SJF run-queue trade-offs
 storage-engine      row serialization → pages → file → B+tree locations
 allocator           metadata · alignment · fragmentation · coalescing failures
+toy-filesystem      path → directory entry → inode-like metadata → fixed-size blocks
 embedded-simulator  simulated sensor event → state machine → digital output
 ```
 
@@ -198,6 +233,10 @@ requires an artifact in another real repository. Current examples:
   lines instead of storing the entire file in memory;
 - **path components as storage boundaries** → `memory-atlas-server`: room/user identifiers are
   sanitized before becoming history filenames, with traversal regression tests.
+- **file durability boundary** → `browser-reliability-runtime`: queue state is written to a temp
+  file, synced, atomically renamed and followed by best-effort directory sync;
+- **optional durable append** → `memory-atlas-server`: chat history append can opt into `fsync` with
+  `CHERRY_HISTORY_DURABLE_WRITES=1` without forcing that latency on default writes.
 
 The full ledger and artifact links live in [`progress/mastery.json`](progress/mastery.json).
 

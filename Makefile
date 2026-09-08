@@ -3,7 +3,7 @@ CXXFLAGS ?= -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -pthread
 DEBUG_FLAGS ?= -std=c++20 -O0 -g -Wall -Wextra -Wpedantic -Werror -Iinclude -pthread
 
 BIN_DIR := build/bin
-LABS := hash_lab heap_lab graph_lab race_lab http_lab btree_lab data_structures_lab algorithm_defense_lab memory_lab process_lab vm_lab storage_lab allocator_lab embedded_lab
+LABS := hash_lab heap_lab graph_lab race_lab http_lab btree_lab data_structures_lab algorithm_defense_lab memory_lab process_lab os_boundary_lab vm_lab scheduler_lab storage_lab allocator_lab toy_filesystem_lab embedded_lab
 LAB_BINS := $(addprefix $(BIN_DIR)/,$(LABS))
 HEADERS := $(shell find include -type f -name '*.hpp')
 TEST_BINS := $(BIN_DIR)/system_tests $(BIN_DIR)/mastery_tests $(BIN_DIR)/differential_tests
@@ -47,13 +47,22 @@ $(BIN_DIR)/memory_lab: labs/memory_locality/main.cpp $(HEADERS) | $(BIN_DIR)
 $(BIN_DIR)/process_lab: labs/process_fd/main.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
+$(BIN_DIR)/os_boundary_lab: labs/os_boundary/main.cpp $(HEADERS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
+
 $(BIN_DIR)/vm_lab: labs/virtual_memory/main.cpp $(HEADERS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+$(BIN_DIR)/scheduler_lab: labs/scheduler/main.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 $(BIN_DIR)/storage_lab: labs/storage_engine/main.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 $(BIN_DIR)/allocator_lab: labs/allocator/main.cpp $(HEADERS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+$(BIN_DIR)/toy_filesystem_lab: labs/toy_filesystem/main.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 $(BIN_DIR)/embedded_lab: labs/embedded_sim/main.cpp $(HEADERS) | $(BIN_DIR)
