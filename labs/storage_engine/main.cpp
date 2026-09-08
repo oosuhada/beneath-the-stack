@@ -93,13 +93,15 @@ int main(int argc, char** argv) {
 
   std::cout << "{\"lab\":\"storage-engine\",\"format\":\"fixed-row + 4KiB pages + in-memory B+tree "
                "index\",\"rows\":"
-            << rows << ",\"queries\":" << queries
+            << rows << ",\"queries\":" << queries << ",\"query_seed\":11400714819323198485"
             << ",\"row_size_bytes\":" << bts::ToyTable::kRowSize
             << ",\"page_size_bytes\":" << bts::Pager::kPageSize
             << ",\"rows_per_page\":" << bts::ToyTable::kRowsPerPage
             << ",\"data_pages\":" << table.data_page_count()
             << ",\"index_height\":" << table.index_height()
             << ",\"index_leaf_count\":" << table.index_leaf_count()
+            << ",\"index_leaf_splits\":" << table.index_leaf_split_count()
+            << ",\"index_internal_splits\":" << table.index_internal_split_count()
             << ",\"range_rows\":" << range.size() << ",\"index_rebuild\":";
   bts::write_stats_json(std::cout, index_rebuild);
   std::cout << ",\"sequential_scan\":";

@@ -1,4 +1,6 @@
 build/
+__pycache__/
+*.pyc
 dashboard/data/latest.json
 evidence/local-*.json
 *.dSYM/

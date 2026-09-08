@@ -1,0 +1,24 @@
+Command:
+  bash tools/run_sanitizers.sh
+
+Environment:
+  MacBook Air / Apple clang 16 / macOS Darwin 27.0.0
+
+Observed deliberate failures:
+  asan_heap_overflow_detected=true
+  ubsan_misaligned_access_detected=true
+  asan_exit=134
+  ubsan_exit=134
+
+Notes:
+  The sanitizer script intentionally runs two crashing programs under sanitizers:
+  experiments/sanitizers/heap_overflow.cpp and experiments/sanitizers/misaligned_access.cpp.
+
+  Earlier, trying to run the full C++ test binary with ASAN_OPTIONS=detect_leaks=1 failed because
+  leak detection is not supported in this local Apple clang runtime. Running the full test binary
+  with ASan also hit a sanitizer_malloc_mac initialization check failure. That limitation is recorded
+  in docs/notebook/2026-09-08-allocator-fragmentation.md and is not treated as coverage.
+
+  UBSan-only builds of mastery_tests and differential_tests passed locally. The deliberate sanitizer
+  binaries are therefore evidence that the tooling can detect specific classes of memory/UB failures,
+  not proof that the toy allocator is production-safe.

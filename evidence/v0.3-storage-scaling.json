@@ -1,0 +1,174 @@
+{
+  "captured_at_utc": "2026-09-08T13:13:50.155198+00:00",
+  "environment": {
+    "architecture": "arm64",
+    "compiler": "Apple clang version 16.0.0 (clang-1600.0.26.3)",
+    "cxxflags": "-std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -pthread",
+    "release": "27.0.0",
+    "system": "Darwin"
+  },
+  "experiment": "storage-scaling",
+  "git_commit": "8ad54f23ab4b71cd8b97e2bcdc4c44a6c55814a5",
+  "method": {
+    "caution": "These measurements are empirical workload observations, not a proof of asymptotic complexity.",
+    "prediction": {
+      "bplus_lookup": "tree navigation should grow much more slowly than a full scan",
+      "index_rebuild": "reopening currently scans all persisted rows, so rebuild should grow with N",
+      "sequential_scan": "work per point query should grow roughly with row count"
+    },
+    "queries_per_size": 200,
+    "query_seed": 11400714819323198485,
+    "repetitions": 5,
+    "warmup": 1
+  },
+  "schema_version": 1,
+  "sizes": [
+    {
+      "data_pages": 32,
+      "format": "fixed-row + 4KiB pages + in-memory B+tree index",
+      "index_height": 3,
+      "index_internal_splits": 2,
+      "index_leaf_count": 62,
+      "index_leaf_splits": 61,
+      "index_rebuild": {
+        "max_ms": 0.106,
+        "mean_ms": 0.1021,
+        "min_ms": 0.10025,
+        "name": "page-scan-index-rebuild",
+        "p50_ms": 0.101625,
+        "p95_ms": 0.105175,
+        "repetitions": 5,
+        "stddev_ms": 0.002036,
+        "warmup": 1
+      },
+      "indexed_lookup": {
+        "max_ms": 0.242667,
+        "mean_ms": 0.241292,
+        "min_ms": 0.240792,
+        "name": "bplus-index-page-lookup",
+        "p50_ms": 0.240959,
+        "p95_ms": 0.24235,
+        "repetitions": 5,
+        "stddev_ms": 0.000694,
+        "warmup": 1
+      },
+      "lab": "storage-engine",
+      "page_size_bytes": 4096,
+      "queries": 200,
+      "query_seed": 11400714819323198485,
+      "range_rows": 32,
+      "row_size_bytes": 128,
+      "rows": 1000,
+      "rows_per_page": 32,
+      "sequential_scan": {
+        "max_ms": 5.885916,
+        "mean_ms": 5.863983,
+        "min_ms": 5.82575,
+        "name": "page-backed-sequential-scan",
+        "p50_ms": 5.874917,
+        "p95_ms": 5.885375,
+        "repetitions": 5,
+        "stddev_ms": 0.022909,
+        "warmup": 1
+      }
+    },
+    {
+      "data_pages": 313,
+      "format": "fixed-row + 4KiB pages + in-memory B+tree index",
+      "index_height": 4,
+      "index_internal_splits": 36,
+      "index_leaf_count": 625,
+      "index_leaf_splits": 624,
+      "index_rebuild": {
+        "max_ms": 0.913959,
+        "mean_ms": 0.902992,
+        "min_ms": 0.898042,
+        "name": "page-scan-index-rebuild",
+        "p50_ms": 0.900083,
+        "p95_ms": 0.9118,
+        "repetitions": 5,
+        "stddev_ms": 0.005728,
+        "warmup": 1
+      },
+      "indexed_lookup": {
+        "max_ms": 0.274083,
+        "mean_ms": 0.260425,
+        "min_ms": 0.250167,
+        "name": "bplus-index-page-lookup",
+        "p50_ms": 0.261458,
+        "p95_ms": 0.272425,
+        "repetitions": 5,
+        "stddev_ms": 0.00914,
+        "warmup": 1
+      },
+      "lab": "storage-engine",
+      "page_size_bytes": 4096,
+      "queries": 200,
+      "query_seed": 11400714819323198485,
+      "range_rows": 32,
+      "row_size_bytes": 128,
+      "rows": 10000,
+      "rows_per_page": 32,
+      "sequential_scan": {
+        "max_ms": 52.286833,
+        "mean_ms": 51.067967,
+        "min_ms": 50.585042,
+        "name": "page-backed-sequential-scan",
+        "p50_ms": 50.870333,
+        "p95_ms": 52.0128,
+        "repetitions": 5,
+        "stddev_ms": 0.621382,
+        "warmup": 1
+      }
+    },
+    {
+      "data_pages": 1563,
+      "format": "fixed-row + 4KiB pages + in-memory B+tree index",
+      "index_height": 4,
+      "index_internal_splits": 191,
+      "index_leaf_count": 3125,
+      "index_leaf_splits": 3124,
+      "index_rebuild": {
+        "max_ms": 4.986667,
+        "mean_ms": 4.911983,
+        "min_ms": 4.870792,
+        "name": "page-scan-index-rebuild",
+        "p50_ms": 4.886042,
+        "p95_ms": 4.978325,
+        "repetitions": 5,
+        "stddev_ms": 0.04621,
+        "warmup": 1
+      },
+      "indexed_lookup": {
+        "max_ms": 0.257958,
+        "mean_ms": 0.254992,
+        "min_ms": 0.252625,
+        "name": "bplus-index-page-lookup",
+        "p50_ms": 0.254417,
+        "p95_ms": 0.257783,
+        "repetitions": 5,
+        "stddev_ms": 0.002172,
+        "warmup": 1
+      },
+      "lab": "storage-engine",
+      "page_size_bytes": 4096,
+      "queries": 200,
+      "query_seed": 11400714819323198485,
+      "range_rows": 32,
+      "row_size_bytes": 128,
+      "rows": 50000,
+      "rows_per_page": 32,
+      "sequential_scan": {
+        "max_ms": 292.89025,
+        "mean_ms": 286.106783,
+        "min_ms": 279.479459,
+        "name": "page-backed-sequential-scan",
+        "p50_ms": 286.60575,
+        "p95_ms": 292.42605,
+        "repetitions": 5,
+        "stddev_ms": 5.2209,
+        "warmup": 1
+      }
+    }
+  ]
+}

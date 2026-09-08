@@ -10,6 +10,9 @@
 
 namespace bts {
 
+inline constexpr std::size_t kMaxHttpHeaderBytes = 8192;
+inline constexpr std::size_t kMaxHttpHeaderCount = 64;
+
 struct HttpRequest {
   std::string method;
   std::string target;
@@ -34,6 +37,9 @@ inline std::string lowercase_ascii(std::string value) {
 }
 
 inline HttpRequest parse_http_request(const std::string& raw) {
+  if (raw.size() > kMaxHttpHeaderBytes) {
+    throw std::invalid_argument("HTTP header block exceeds parser limit");
+  }
   const std::size_t header_end = raw.find("\r\n\r\n");
   if (header_end == std::string::npos) {
     throw std::invalid_argument("incomplete HTTP header block");
@@ -58,8 +64,14 @@ inline HttpRequest parse_http_request(const std::string& raw) {
   if (request.method.empty() || request.target.empty() || request.version != "HTTP/1.1") {
     throw std::invalid_argument("unsupported HTTP request line");
   }
+  if (request.method.find_first_of("\r\n\t") != std::string::npos ||
+      request.target.find_first_of("\r\n\t") != std::string::npos) {
+    throw std::invalid_argument("control character in HTTP request line");
+  }
 
   std::size_t cursor = first_line_end + 2;
+  std::size_t header_count = 0;
+  std::size_t host_count = 0;
   while (cursor < header_end) {
     const std::size_t line_end = raw.find("\r\n", cursor);
     if (line_end == std::string::npos || line_end > header_end) {
@@ -70,9 +82,21 @@ inline HttpRequest parse_http_request(const std::string& raw) {
     if (colon == std::string::npos || colon == 0) {
       throw std::invalid_argument("malformed HTTP header");
     }
-    request.headers.emplace_back(lowercase_ascii(trim_ascii(line.substr(0, colon))),
-                                 trim_ascii(line.substr(colon + 1)));
+    if (++header_count > kMaxHttpHeaderCount) {
+      throw std::invalid_argument("too many HTTP headers");
+    }
+    std::string name = lowercase_ascii(trim_ascii(line.substr(0, colon)));
+    if (name.empty() || name.find_first_of(" \t\r\n") != std::string::npos) {
+      throw std::invalid_argument("invalid HTTP header name");
+    }
+    if (name == "host") {
+      ++host_count;
+    }
+    request.headers.emplace_back(std::move(name), trim_ascii(line.substr(colon + 1)));
     cursor = line_end + 2;
+  }
+  if (host_count != 1) {
+    throw std::invalid_argument("HTTP/1.1 requires exactly one Host header in this toy parser");
   }
   return request;
 }

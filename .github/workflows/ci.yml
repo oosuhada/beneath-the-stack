@@ -39,12 +39,14 @@ jobs:
           with open('/tmp/beneath-the-stack-evidence.json', encoding='utf-8') as handle:
               payload = json.load(handle)
           assert payload['schema_version'] == 2
-          assert len(payload['labs']) == 11
+          assert len(payload['labs']) == 17
           assert {lab['lab'] for lab in payload['labs']} == {
               'hash-table', 'heap-scheduler', 'graph-traversal',
               'concurrency-race', 'raw-http', 'db-index',
-              'data-structures', 'memory-locality', 'process-fd',
-              'storage-engine', 'embedded-simulator'
+              'data-structures', 'algorithm-defense',
+              'memory-locality', 'process-fd', 'os-boundary',
+              'virtual-memory', 'scheduler-internals', 'storage-engine',
+              'allocator', 'toy-filesystem', 'embedded-simulator'
           }
           assert payload['git_commit']
           assert payload['environment']['cxxflags']

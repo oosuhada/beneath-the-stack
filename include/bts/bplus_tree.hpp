@@ -83,6 +83,9 @@ class BPlusTree {
     return count;
   }
 
+  std::size_t leaf_split_count() const { return leaf_split_count_; }
+  std::size_t internal_split_count() const { return internal_split_count_; }
+
  private:
   struct Node {
     explicit Node(bool is_leaf) : leaf(is_leaf) {}
@@ -134,6 +137,7 @@ class BPlusTree {
   }
 
   Split split_leaf(Node* node) {
+    ++leaf_split_count_;
     const std::size_t middle = node->keys.size() / 2;
     auto right = std::make_unique<Node>(true);
     right->keys.assign(node->keys.begin() + static_cast<std::ptrdiff_t>(middle), node->keys.end());
@@ -148,6 +152,7 @@ class BPlusTree {
   }
 
   Split split_internal(Node* node) {
+    ++internal_split_count_;
     const std::size_t middle = node->keys.size() / 2;
     const Key separator = node->keys[middle];
     auto right = std::make_unique<Node>(false);
@@ -173,6 +178,8 @@ class BPlusTree {
 
   std::size_t order_;
   std::unique_ptr<Node> root_;
+  std::size_t leaf_split_count_ = 0;
+  std::size_t internal_split_count_ = 0;
 };
 
 }  // namespace bts

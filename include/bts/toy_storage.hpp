@@ -208,6 +208,8 @@ class ToyTable {
 
   std::size_t index_height() const { return index_->height(); }
   std::size_t index_leaf_count() const { return index_->leaf_count(); }
+  std::size_t index_leaf_split_count() const { return index_->leaf_split_count(); }
+  std::size_t index_internal_split_count() const { return index_->internal_split_count(); }
 
   static RowLocation location_for(std::uint64_t row_number) {
     return RowLocation{static_cast<std::uint32_t>(1 + row_number / kRowsPerPage),

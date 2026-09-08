@@ -4,9 +4,12 @@
 #include <string>
 #include <vector>
 
+#include "bts/allocator.hpp"
 #include "bts/data_structures.hpp"
 #include "bts/embedded.hpp"
 #include "bts/http.hpp"
+#include "bts/scheduler.hpp"
+#include "bts/toy_filesystem.hpp"
 #include "bts/toy_storage.hpp"
 
 namespace {
@@ -129,6 +132,77 @@ void test_http_parser() {
   check_throws<std::invalid_argument>(
       [&] { (void)bts::parse_http_request("GET / HTTP/2\r\nHost: localhost\r\n\r\n"); },
       "HTTP parser makes supported protocol boundary explicit");
+  check_throws<std::invalid_argument>(
+      [&] {
+        (void)bts::parse_http_request("GET / HTTP/1.1\r\nBad Header: x\r\nHost: localhost\r\n\r\n");
+      },
+      "HTTP parser rejects whitespace inside header names");
+  check_throws<std::invalid_argument>(
+      [&] { (void)bts::parse_http_request("GET / HTTP/1.1\r\nConnection: close\r\n\r\n"); },
+      "HTTP/1.1 parser requires a Host header");
+  check_throws<std::invalid_argument>(
+      [&] {
+        std::string oversized = "GET / HTTP/1.1\r\nHost: localhost\r\nX: ";
+        oversized.append(bts::kMaxHttpHeaderBytes, 'x');
+        oversized += "\r\n\r\n";
+        (void)bts::parse_http_request(oversized);
+      },
+      "HTTP parser caps header bytes before unbounded buffering becomes parser work");
+
+  std::uint64_t state = 0x5eedf00dULL;
+  std::size_t accepted_mutations = 0;
+  for (int sample = 0; sample < 500; ++sample) {
+    std::string mutated = "GET /fuzz HTTP/1.1\r\nHost: localhost\r\nX-Fuzz: value\r\n\r\n";
+    state ^= state << 13;
+    state ^= state >> 7;
+    state ^= state << 17;
+    const std::size_t index = static_cast<std::size_t>(state % mutated.size());
+    mutated[index] = static_cast<char>(state & 0x7fU);
+    try {
+      const auto parsed = bts::parse_http_request(mutated);
+      ++accepted_mutations;
+      check(parsed.version == "HTTP/1.1" && !parsed.method.empty() && !parsed.target.empty() &&
+                parsed.headers.size() <= bts::kMaxHttpHeaderCount,
+            "accepted parser mutation still satisfies parser invariants");
+    } catch (const std::invalid_argument&) {
+    }
+  }
+  check(accepted_mutations > 0 && accepted_mutations < 500,
+        "fixed-seed parser mutations exercise both accepted and rejected inputs");
+}
+
+void test_allocator() {
+  bts::FreeListAllocator allocator(4096, true);
+  void* first = allocator.allocate(31);
+  void* second = allocator.allocate(127);
+  check(first != nullptr && second != nullptr, "free-list allocator returns payloads from arena");
+  check(reinterpret_cast<std::uintptr_t>(first) % bts::FreeListAllocator::kAlignment == 0,
+        "allocator payload obeys max_align_t alignment");
+  allocator.deallocate(first);
+  void* reused = allocator.allocate(16);
+  check(reused == first, "first-fit free list reuses a released compatible block");
+  allocator.deallocate(reused);
+  allocator.deallocate(second);
+  const auto final_stats = allocator.stats();
+  check(final_stats.live_requested_bytes == 0 && final_stats.largest_free_block_bytes > 3500,
+        "coalescing restores one large free region after adjacent frees");
+  check_throws<std::invalid_argument>(
+      [&] { allocator.deallocate(second); },
+      "toy allocator detects double free instead of corrupting list");
+
+  bts::FreeListAllocator fragmented(1280, false);
+  void* a = fragmented.allocate(240);
+  void* b = fragmented.allocate(240);
+  void* c = fragmented.allocate(240);
+  void* d = fragmented.allocate(240);
+  check(a != nullptr && b != nullptr && c != nullptr && d != nullptr,
+        "fragmentation fixture fills arena with four blocks");
+  fragmented.deallocate(b);
+  fragmented.deallocate(c);
+  check(fragmented.allocate(400) == nullptr,
+        "without coalescing total free space can exist without a large enough contiguous block");
+  fragmented.deallocate(a);
+  fragmented.deallocate(d);
 }
 
 void test_toy_storage() {
@@ -181,6 +255,38 @@ void test_embedded_simulator() {
       "embedded controller rejects inverted hysteresis thresholds");
 }
 
+void test_scheduler_simulator() {
+  const std::vector<bts::SchedulerJob> jobs{
+      {0, 0, 20, 5}, {1, 0, 2, 0}, {2, 1, 2, 0}, {3, 2, 2, 0}};
+  const auto fifo = bts::simulate_fifo(jobs, 10);
+  const auto round_robin = bts::simulate_round_robin(jobs, 4, 10);
+  const auto priority = bts::simulate_priority_non_preemptive(jobs, 10);
+  const auto sjf = bts::simulate_shortest_job_first(jobs, 10);
+  check(fifo.max_waiting > round_robin.max_waiting,
+        "round robin can reduce the convoy max wait for short jobs in the toy scheduler");
+  check(priority.jobs[0].waiting > 0,
+        "priority scheduling can delay a long low-priority job even when it arrived first");
+  check(sjf.mean_turnaround <= fifo.mean_turnaround,
+        "shortest-job-first improves mean turnaround for the toy convoy fixture");
+}
+
+void test_toy_filesystem() {
+  bts::ToyFileSystem fs;
+  fs.mkdir("/var");
+  fs.mkdir("/var/log");
+  fs.write_file("/var/log/app.txt", "directory entries resolve to inode-like metadata and blocks");
+  fs.link_file("/var/log/app.txt", "/var/log/app.link");
+  const auto left = fs.stat("/var/log/app.txt");
+  const auto right = fs.stat("/var/log/app.link");
+  check(left.inode == right.inode && left.reference_count == 2,
+        "toy hard link gives two directory entries to the same inode-like object");
+  check(
+      left.block_count > 1 && fs.read_file("/var/log/app.link") == fs.read_file("/var/log/app.txt"),
+      "toy filesystem reads file content through fixed-size blocks regardless of path alias");
+  check_throws<std::invalid_argument>([&] { (void)fs.lookup("/var/../etc/passwd"); },
+                                      "toy filesystem rejects traversal path components");
+}
+
 }  // namespace
 
 int main() {
@@ -188,8 +294,11 @@ int main() {
   test_linear_structures();
   test_tree_trie_union_find();
   test_http_parser();
+  test_allocator();
   test_toy_storage();
   test_embedded_simulator();
+  test_scheduler_simulator();
+  test_toy_filesystem();
   if (failures != 0) {
     std::cerr << failures << " mastery test(s) failed\n";
     return 1;
