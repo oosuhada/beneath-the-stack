@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(beneath_the_stack VERSION 0.1.0 LANGUAGES CXX)
+project(beneath_the_stack VERSION 0.2.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,8 +25,15 @@ add_bts_executable(graph_lab labs/graph_traversal/main.cpp)
 add_bts_executable(race_lab labs/concurrency_race/main.cpp)
 add_bts_executable(http_lab labs/raw_http/main.cpp)
 add_bts_executable(btree_lab labs/db_index/main.cpp)
+add_bts_executable(data_structures_lab labs/data_structures/main.cpp)
+add_bts_executable(memory_lab labs/memory_locality/main.cpp)
+add_bts_executable(process_lab labs/process_fd/main.cpp)
+add_bts_executable(storage_lab labs/storage_engine/main.cpp)
+add_bts_executable(embedded_lab labs/embedded_sim/main.cpp)
 add_bts_executable(system_tests tests/system_tests.cpp)
+add_bts_executable(mastery_tests tests/mastery_tests.cpp)
 
 enable_testing()
 add_test(NAME system_tests COMMAND system_tests)
+add_test(NAME mastery_tests COMMAND mastery_tests)
 

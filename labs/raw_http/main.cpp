@@ -1,10 +1,12 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 #include <atomic>
 #include <cerrno>
+#include <chrono>
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
@@ -18,6 +20,7 @@
 
 #include "bts/benchmark.hpp"
 #include "bts/cli.hpp"
+#include "bts/http.hpp"
 #include "bts/json.hpp"
 
 namespace {
@@ -41,11 +44,6 @@ void send_all(int fd, const std::string& payload) {
     }
     sent += static_cast<std::size_t>(result);
   }
-}
-
-bool request_wants_close(const std::string& request) {
-  return request.find("Connection: close") != std::string::npos ||
-         request.find("connection: close") != std::string::npos;
 }
 
 class LoopbackHttpServer {
@@ -148,9 +146,13 @@ class LoopbackHttpServer {
           continue;
         }
 
-        const std::string request = buffer.substr(0, header_end + 4);
+        const std::string raw_request = buffer.substr(0, header_end + 4);
         buffer.erase(0, header_end + 4);
-        const bool close_after = request_wants_close(request);
+        const bts::HttpRequest request = bts::parse_http_request(raw_request);
+        const bool close_after = bts::http_connection_close(request);
+        if (request.target == "/slow") {
+          std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        }
         requests_.fetch_add(1, std::memory_order_relaxed);
         const std::string connection = close_after ? "close" : "keep-alive";
         const std::string body = "ok\n";
@@ -198,9 +200,10 @@ int connect_loopback(std::uint16_t port) {
   return fd;
 }
 
-void send_request(int fd, bool close_after) {
+void send_request(int fd, const std::string& target, bool close_after) {
   const std::string connection = close_after ? "close" : "keep-alive";
-  send_all(fd, "GET /health HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: " + connection + "\r\n\r\n");
+  send_all(fd, "GET " + target + " HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: " + connection +
+                   "\r\n\r\n");
 }
 
 void read_response(int fd) {
@@ -237,7 +240,7 @@ void read_response(int fd) {
 void run_new_connections(std::uint16_t port, std::size_t requests) {
   for (std::size_t i = 0; i < requests; ++i) {
     const int fd = connect_loopback(port);
-    send_request(fd, true);
+    send_request(fd, "/health", true);
     read_response(fd);
     close_socket(fd);
   }
@@ -246,10 +249,43 @@ void run_new_connections(std::uint16_t port, std::size_t requests) {
 void run_keep_alive(std::uint16_t port, std::size_t requests) {
   const int fd = connect_loopback(port);
   for (std::size_t i = 0; i < requests; ++i) {
-    send_request(fd, i + 1 == requests);
+    send_request(fd, "/health", i + 1 == requests);
     read_response(fd);
   }
   close_socket(fd);
+}
+
+void run_connection_pool(std::uint16_t port, std::size_t pool_size, std::size_t requests) {
+  std::vector<int> connections;
+  connections.reserve(pool_size);
+  for (std::size_t i = 0; i < pool_size; ++i) {
+    connections.push_back(connect_loopback(port));
+  }
+  for (std::size_t i = 0; i < requests; ++i) {
+    const int fd = connections[i % connections.size()];
+    send_request(fd, "/health", false);
+    read_response(fd);
+  }
+  for (const int fd : connections) {
+    ::shutdown(fd, SHUT_RDWR);
+    close_socket(fd);
+  }
+}
+
+bool timeout_is_observable(std::uint16_t port) {
+  const int fd = connect_loopback(port);
+  timeval timeout{};
+  timeout.tv_usec = 5000;
+  if (::setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) != 0) {
+    close_socket(fd);
+    throw std::runtime_error("SO_RCVTIMEO setup failed");
+  }
+  send_request(fd, "/slow", true);
+  char byte = 0;
+  const ssize_t received = ::recv(fd, &byte, 1, 0);
+  const int saved_errno = errno;
+  close_socket(fd);
+  return received < 0 && (saved_errno == EAGAIN || saved_errno == EWOULDBLOCK);
 }
 
 void run_parallel(std::uint16_t port, std::size_t clients, std::size_t requests_per_client) {
@@ -276,18 +312,27 @@ int main(int argc, char** argv) {
                                              [&] { run_new_connections(server.port(), requests); });
   const auto keep_alive = bts::benchmark("http-keep-alive", warmup, repetitions,
                                          [&] { run_keep_alive(server.port(), requests); });
+  const std::size_t pool_size = std::max<std::size_t>(1, clients);
+  const auto pool = bts::benchmark("connection-pool-reuse", warmup, repetitions, [&] {
+    run_connection_pool(server.port(), pool_size, requests);
+  });
   const std::size_t parallel_requests = std::max<std::size_t>(1, requests / clients);
   const auto concurrent = bts::benchmark("concurrent-keep-alive", warmup, repetitions, [&] {
     run_parallel(server.port(), clients, parallel_requests);
   });
+  const bool timeout_observed = timeout_is_observable(server.port());
 
   std::cout << "{\"lab\":\"raw-http\",\"transport\":\"POSIX TCP loopback + hand-written HTTP/1.1 "
                "framing\",\"requests_per_run\":"
-            << requests << ",\"concurrent_clients\":" << clients
-            << ",\"server_port\":" << server.port() << ",\"new_connection\":";
+            << requests << ",\"concurrent_clients\":" << clients << ",\"pool_size\":" << pool_size
+            << ",\"server_port\":" << server.port()
+            << ",\"parser\":\"request-line + normalized headers\",\"timeout_observed\":"
+            << (timeout_observed ? "true" : "false") << ",\"new_connection\":";
   bts::write_stats_json(std::cout, new_connection);
   std::cout << ",\"keep_alive\":";
   bts::write_stats_json(std::cout, keep_alive);
+  std::cout << ",\"connection_pool\":";
+  bts::write_stats_json(std::cout, pool);
   std::cout << ",\"concurrent_keep_alive\":";
   bts::write_stats_json(std::cout, concurrent);
   std::cout << ",\"requests_served\":" << server.request_count() << "}\n";

@@ -1,228 +1,242 @@
 # beneath-the-stack
 
-**Beyond the browser. From product code to systems fundamentals.**
+**A product engineer reverse-engineering the abstractions he already uses.**
 
-I have spent most of my development time building things people can use directly: web products,
-AI/RAG systems, backend APIs, databases, deployment pipelines and interactive interfaces. That work
-taught me how to turn an idea into a product, but it also made one boundary increasingly visible:
-once the browser and application frameworks disappear, much more of the computer becomes my
-responsibility.
+I started this project because frameworks made it possible to build useful software without always
+having to look at what happened underneath. That is productive until the abstraction itself becomes
+the thing I need to debug.
 
-Operating systems, memory, sockets, scheduling, concurrency, storage engines, embedded devices and
-hardware control do not become understandable just because I can assemble a good web stack. They
-force the underlying data structures, algorithms and machine behavior back into view.
+Why is this lookup fast? Why does this request block? Why can two workers claim the same job? Why
+does an index help? What survives `fork()`? What does a file descriptor actually refer to? What
+happens between a row object and bytes on disk?
 
-`beneath-the-stack` is where I study that layer in the same way I usually build products:
-**implement something, break assumptions, measure the behavior, make the evidence inspectable and
-then explain the trade-off.** It is intentionally not another archive of solved coding-test
-problems.
+Instead of replacing product work with a textbook checklist, `beneath-the-stack` uses the systems I
+already built as questions. I implement the smallest useful version of an abstraction, test its
+invariants, measure it, explain its failure modes, and—when the lesson is genuinely useful—take it
+back to a real project.
 
 ```text
-Don't memorize the abstraction.
-Break it.
-Implement it.
-Measure it.
-Explain it.
+concept
+  ↓
+from-scratch implementation
+  ↓
+correctness / failure case
+  ↓
+benchmark / trace
+  ↓
+explanation
+  ↓
+real product application
 ```
 
-## v0.1 at a glance
+This is not a coding-test solution archive and it is not a dashboard project. The browser UI is an
+observer. The C++ implementations, POSIX experiments, tests and versioned evidence are the project.
 
-The first release is deliberately small. Six executable C++20 labs establish the project contract
-before the roadmap grows.
+## v0.2 — from labs to an evidence graph
 
-| Lab | What is implemented | What is measured / observed |
+v0.1 established six executable experiments. v0.2 keeps those and adds the missing bridges between
+data structures, operating-system boundaries, memory layout, networking and persisted storage.
+
+| Area | Evidence in v0.2 | Question it answers |
 | --- | --- | --- |
-| **Hash Table** | FNV-1a hashing, separate chaining, linear probing, resizing | insert/lookup latency, load factor, collision-chain histogram, cluster length |
-| **Heap Scheduler** | binary min-heap from scratch + earliest-deadline scheduler | heap scheduling versus repeated linear minimum selection + execution trace |
-| **BFS / DFS** | adjacency-list graph, BFS, DFS, shortest-path reconstruction | traversal latency, visit order, path, peak frontier size |
-| **Race / Mutex / Atomic** | split load/store lost-update race, mutex increment, atomic `fetch_add` | correctness gap and p50/p95 timing without invoking a C++ data-race UB |
-| **Raw TCP / HTTP** | POSIX loopback server/client, HTTP/1.1 framing, keep-alive, concurrent clients | new connection versus keep-alive versus concurrent keep-alive |
-| **B+ Tree Index** | insertion, node splitting, lookup, linked-leaf range scan | index build cost, lookup versus sequential scan, tree height and leaf count |
+| Data structures | custom dynamic array, linked list, stack, queue, BST, trie, union-find | What does the standard library normally own for me? |
+| Hash / heap / graph | from-scratch implementations retained from v0.1 | Why do collision policy, priority ordering and traversal frontier shape matter? |
+| OS boundary | real `fork`, `pipe`, `dup`, `waitpid`, `getpid` experiments | What is copied, shared, or represented by the kernel? |
+| Memory | contiguous traversal vs pointer chasing; stack-frame vs heap-block touch | How can the same logical values have different machine costs? |
+| Concurrency | lost-update, mutex, atomic + real atomic filesystem claim application | Where does a compound operation need one ownership boundary? |
+| Networking | POSIX TCP, HTTP/1.1 parser, keep-alive, connection pool, receive timeout | What does a framework hide between request code and sockets? |
+| Database internals | B+ tree plus 4 KiB pager, fixed-row serialization and index rebuild | How does `row → page → file → index lookup` fit together? |
+| Embedded foundation | HAL interface + deterministic temperature/state-machine simulator | How can core logic be testable before physical hardware exists? |
 
-Every benchmark reports warm-up count, repetitions, mean, standard deviation, p50, p95, minimum and
-maximum. The committed results are observations from one machine, not universal performance claims.
+The implementation inventory is intentionally smaller than a complete CS curriculum. A topic only
+moves forward when an artifact exists; unfinished topics remain explicit in
+[`progress/mastery.json`](progress/mastery.json).
 
-## Architecture
-
-The browser is an observer, not the system under test.
+## The systems core
 
 ```text
-┌──────────────────────────────────────────────────────────────┐
-│                    C++20 systems core                       │
-│  hash table · heap · graph · threads · sockets · B+ tree   │
-└──────────────────────────────┬───────────────────────────────┘
-                               │
-                     measurements / traces
-                               │
-┌──────────────────────────────▼───────────────────────────────┐
-│                reproducible evidence runner                 │
-│     warm-up · repetitions · p50/p95 · environment          │
-└──────────────────────────────┬───────────────────────────────┘
-                               │
-                     JSON evidence document
-                               │
-┌──────────────────────────────▼───────────────────────────────┐
-│                    local lab observer                       │
-│   collisions · traversal · scheduler · race · HTTP · DB    │
-└──────────────────────────────────────────────────────────────┘
+include/bts/
+├── data_structures.hpp  dynamic array · linked list · stack · queue · BST · trie · union-find
+├── hash_table.hpp       chaining · linear probing · load factor · resize
+├── min_heap.hpp         binary min-heap
+├── graph.hpp            BFS · DFS · path reconstruction
+├── counter.hpp          lost-update · mutex · atomic
+├── http.hpp             HTTP request-line/header parser
+├── bplus_tree.hpp       B+ tree internal/leaf split · linked leaves
+├── toy_storage.hpp      fixed rows · 4 KiB pager · persisted B+tree locations
+├── embedded.hpp         HAL boundary · simulated output · thermal state machine
+└── benchmark.hpp        warm-up · repeated samples · p50/p95 · mean/stddev
 ```
 
-The reusable implementations live in `include/bts/`. Each executable experiment lives under
-`labs/`. `tools/run_labs.py` is only orchestration: it does not calculate the algorithmic result. The
-dashboard reads the JSON emitted by those binaries.
+No third-party C++ data-structure or benchmark framework is required for these labs.
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the layer boundaries and design constraints.
+## Executable laboratories
 
-## Run it
+Eleven binaries emit machine-readable JSON. `tools/run_labs.py` only orchestrates them; it does not
+manufacture algorithm results.
 
-The local build has no third-party C++ dependency.
+```text
+hash-table          collision / load-factor behavior
+heap-scheduler      priority selection vs repeated linear minimum
+graph-traversal     BFS / DFS path and frontier behavior
+concurrency-race    lost updates vs mutex / atomic correctness
+raw-http            parser / keep-alive / pool / timeout behavior
+db-index            in-memory B+ tree lookup and range behavior
+data-structures     array/list/BST/trie/union-find behavior
+memory-locality     contiguous vs pointer-chasing memory access
+process-fd          fork/process isolation/syscall/file-descriptor semantics
+storage-engine      row serialization → pages → file → B+tree locations
+embedded-simulator  simulated sensor event → state machine → digital output
+```
+
+## Evidence, not a leaderboard
+
+Release evidence is captured on the MacBook Air with the compiler, flags, OS, hardware, input size,
+warm-up and repetition counts stored next to the result. Each benchmark contains mean, standard
+deviation, p50, p95, min and max. A normalized CSV is emitted alongside JSON so results can be
+compared without scraping prose.
 
 ```bash
 make -j2 all
 make test
 make lint
-python3 tools/run_labs.py --profile quick
+
+python3 tools/run_labs.py \
+  --profile standard \
+  --output evidence/v0.2-macbook-air.json \
+  --csv-output evidence/v0.2-macbook-air.csv
 ```
 
-For the fuller benchmark profile:
+See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for release observations and their limitations.
+Numbers in this repository are workload-specific observations, not hardware-independent truths.
 
-```bash
-python3 tools/run_labs.py --profile standard
-```
+Examples of claims this project deliberately **does not** make:
 
-To open the observer after generating data:
+- a toy B+ tree is PostgreSQL;
+- loopback HTTP latency is internet latency;
+- one mutex/atomic counter benchmark determines a production synchronization strategy;
+- a simulated HAL counts as physical GPIO experience;
+- one contiguous-layout benchmark proves every linked structure is slow.
 
-```bash
-python3 tools/run_labs.py --profile standard --dashboard-data
-python3 -m http.server 8080 -d dashboard
-```
+## Learned → implemented → measured → applied
 
-Then open `http://localhost:8080`. CMake is also supported for portable CI builds:
-
-```bash
-cmake -S . -B build-cmake -DCMAKE_BUILD_TYPE=Release
-cmake --build build-cmake
-ctest --test-dir build-cmake --output-on-failure
-```
-
-## Evidence from the MacBook Air
-
-The v0.1 release evidence is generated on the MacBook Air with the standard profile and recorded in
-[`docs/BENCHMARKS.md`](docs/BENCHMARKS.md). It is intentionally reported with the machine/compiler
-context and without claims that one result will generalize to another CPU, compiler or operating
-system.
-
-| Experiment | v0.1 MacBook Air observation |
-| --- | --- |
-| Heap priority selection | 2,500 tasks: heap p50 **0.233 ms** vs repeated linear-min **5.709 ms** |
-| Concurrency correctness | split load/store **138,209 / 800,000**; mutex and atomic both **800,000 / 800,000** |
-| HTTP connection reuse | 80 loopback requests: new-connection p50 **4.211 ms** vs keep-alive **1.196 ms** |
-| B+ tree point queries | 600 queries over 12,000 rows: sequential-scan p50 **0.922 ms** vs index **0.015 ms**; build p50 **0.890 ms** |
-
-These are deliberately paired with the work performed and the correctness/maintenance cost. For
-example, the incorrect race variant is faster because it loses updates, while the B+ tree read result
-is reported together with index build cost.
-
-The strongest observations are meant to answer *why* an abstraction exists, not to produce a
-leaderboard:
-
-- collisions remain manageable only while the table controls load factor and resize policy;
-- a heap changes repeated priority selection from scanning the whole pending set to logarithmic
-  insertion/removal behavior;
-- BFS pays for a wider frontier because it preserves shortest-path guarantees on an unweighted graph;
-- synchronization strategy changes both correctness and coordination cost;
-- HTTP keep-alive avoids repeatedly paying the TCP connection setup cost even on loopback;
-- an index has a build/maintenance cost, but repeated point lookups stop scanning every row.
-
-## What I can now explain
-
-v0.1 is considered learned only where the repository contains an implementation, a failing or
-contrasting case, a measurement and an explanation.
-
-- why average hash-table lookup can be constant-time while worst-case lookup is still linear;
-- how chaining and open addressing respond differently to load and collisions;
-- why a binary heap is a natural priority-queue representation but is not a general replacement for sorting;
-- why BFS finds an unweighted shortest path and why DFS often keeps a different memory shape;
-- why individually atomic operations do not automatically make a compound operation atomic;
-- what a mutex protects versus what `fetch_add` guarantees in the counter experiment;
-- what a TCP connection and an HTTP/1.1 keep-alive request actually look like below a framework;
-- why a B+ tree keeps search keys in internal nodes and linked data-bearing leaves for range access;
-- why a PostgreSQL-style index can trade write/build work and storage for faster reads.
-
-The goal is not to claim mastery of all systems programming from six labs. The goal is to make every
-future claim earn evidence in the same way.
-
-## Interview mode
-
-Each completed concept gets a short explanation, a deeper explanation, a code pointer, trade-off
-questions and a connection back to application engineering:
-
-- [`docs/interview/hash-table.md`](docs/interview/hash-table.md)
-- [`docs/interview/heap-priority-queue.md`](docs/interview/heap-priority-queue.md)
-- [`docs/interview/bfs-dfs.md`](docs/interview/bfs-dfs.md)
-- [`docs/interview/concurrency.md`](docs/interview/concurrency.md)
-- [`docs/interview/tcp-http.md`](docs/interview/tcp-http.md)
-- [`docs/interview/bplus-tree.md`](docs/interview/bplus-tree.md)
-
-The format is deliberately not an answer sheet. The questions are prompts that should be answerable
-from the implementation and evidence in this repository.
-
-## Mastery, not problem count
-
-Progress is tracked in [`progress/mastery.json`](progress/mastery.json) using five evidence stages:
+Progress uses a six-level evidence contract rather than solved-problem count:
 
 ```text
-learned → implemented → benchmarked → explained → applied
+0  Not Started
+1  Explained
+2  Implemented
+3  Tested
+4  Benchmarked
+5  Applied to Real Project
 ```
 
-`applied` means the concept has been placed into a scenario with a purpose beyond calling the data
-structure once: scheduler behavior, pathfinding, connection reuse, indexed record lookup, and so on.
-It does **not** mean production-hardened.
+Level 5 is intentionally difficult. A concept does not receive it because a toy demo exists. It
+requires an artifact in another real repository. Current examples:
 
-The long-term domains are:
+- **compound atomicity / ownership** → `browser-reliability-runtime`: competing workers now claim a
+  file-backed job with filesystem `rename` as the ownership boundary, with a race regression test;
+- **bounded memory retention** → `memory-atlas-server`: limited history reads retain only the last N
+  lines instead of storing the entire file in memory.
+
+The full ledger and artifact links live in [`progress/mastery.json`](progress/mastery.json).
+
+## Existing software is part of the curriculum
+
+The project does not copy old solutions into a new folder. It links different kinds of evidence:
 
 ```text
-Data Structures
-Algorithms
-Operating Systems
-Networking
-Database Internals
-Concurrency
-Systems Programming
-Embedded / Hardware
+BFS
+├── practice history / representative problems
+├── from-scratch graph implementation
+├── traversal benchmark
+├── interview explanation
+└── product/simulation connection
 ```
 
-## Beyond the browser
+- [`docs/algorithm-patterns.md`](docs/algorithm-patterns.md) maps repeated problem patterns to the
+  mechanism underneath them.
+- [`docs/learning-history-map.md`](docs/learning-history-map.md) connects existing coding-study repos
+  instead of duplicating their solutions.
+- [`docs/applied-concepts.md`](docs/applied-concepts.md) maps CS concepts back to existing products.
 
-v0.2 expands downward rather than sideways. Planned labs include stack/heap allocation and
-fragmentation, virtual-memory/page experiments, file descriptors and syscalls, deadlock + wait-for
-graphs, UDP/DNS, socket pooling, a PostgreSQL `EXPLAIN ANALYZE` bridge, and the missing algorithm/data
-structure fundamentals (linked list, BST, sorting, binary search, greedy, basic DP).
+This also records cases where applying a learned structure would be bad engineering. For example,
+`elevator-queue-lab` has only six cars and dynamically changing dispatch scores, so replacing a
+small scan with a heap merely to demonstrate a heap would add invalidation complexity without a
+clear benefit.
 
-Embedded/hardware is a separate future phase. No physical Raspberry Pi, Arduino or ESP32 result is
-claimed in v0.1. The roadmap first introduces a small hardware-abstraction boundary and simulator;
-real GPIO/serial/interrupt evidence only becomes complete after a physical device is actually
-connected and measured.
+## Source bridges, not forks
+
+Toy implementations are compared to real systems without pretending to reproduce them.
+
+[`docs/xv6-bridge.md`](docs/xv6-bridge.md) maps the POSIX process/FD labs to the corresponding xv6
+areas—`proc.c`, `syscall.c`, `file.c`, `pipe.c`, `vm.c`, `spinlock.c` and `swtch.S`. Database and
+networking references similarly use small educational systems such as `db_tutorial` and
+`mini-redis` to locate the next abstraction boundary.
+
+Classmate repositories are used for **problem selection and practice cadence**, not code copying.
+Most surveyed algorithm repositories expose no explicit permissive license, so their implementation
+code is not imported. The audit is in [`docs/REFERENCES.md`](docs/REFERENCES.md).
+
+## Interview verification
+
+Interview notes are not memorized answer sheets. Each topic must answer four questions from code and
+evidence:
+
+```text
+1. What is it?
+2. Why does it work?
+3. When does it fail?
+4. Where did I use it?
+```
+
+Current notes cover hash tables, heap/priority queues, BFS/DFS, concurrency, TCP/HTTP, B+ trees,
+from-scratch data structures, process/file descriptors, memory locality, page-backed storage and the
+embedded HAL simulator. See [`docs/interview/`](docs/interview/).
+
+## Architecture rule: the UI is an oscilloscope
+
+The visualization layer is intentionally thin:
+
+```text
+C++ / POSIX implementation
+        ↓
+test + benchmark + trace
+        ↓
+JSON evidence
+        ↓
+optional local observer
+```
+
+Deleting `dashboard/` must not remove any experiment. See
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## What comes next
+
+The next milestones go deeper before they go wider:
+
+1. deadlock + wait-for graph + lock ordering;
+2. allocator/free-list fragmentation and virtual-memory/page-touch experiments;
+3. UDP/DNS and event-driven I/O (`kqueue`/`epoll`) bridge;
+4. PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)`, transaction/isolation, MVCC and WAL;
+5. algorithm patterns still missing real mechanism labs: binary search, sorting, greedy,
+   backtracking and dynamic programming;
+6. compiler/architecture bridge: local `-O0` vs `-O2` assembly, stack frames, branches and cache;
+7. physical Pico/ESP32/Arduino evidence only after a device is actually connected.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
-## Tests and quality bar
+## Quality bar
 
-- deterministic structure/invariant tests in `tests/system_tests.cpp`;
-- `-Wall -Wextra -Wpedantic -Werror` on local/CI builds;
-- quick benchmark smoke test in CI to verify every experiment remains executable;
-- CMake portability build in addition to the dependency-free Makefile path;
-- CI formatting check with `clang-format`;
-- benchmark methodology records warm-up, repetitions and environment metadata;
-- no benchmark number is described as hardware-independent truth.
+- C++20, `-Wall -Wextra -Wpedantic -Werror`;
+- deterministic `system_tests` and `mastery_tests`;
+- malformed/edge-case coverage for new structures and HTTP parsing;
+- persistence close/reopen checks for the toy storage engine;
+- `clang-format` gate;
+- Makefile and CMake build paths;
+- 11-lab quick smoke in CI;
+- versioned JSON + CSV benchmark evidence;
+- Ubuntu CI plus macOS/Apple-Silicon release measurements.
 
-## Reference and license policy
-
-I inspected several public classmate repositories for study organization before defining this
-project. Their GitHub metadata did not expose an explicit code license for the algorithm repositories
-surveyed, so **no source code was copied from them**. They are recorded only as investigated
-references in [`docs/REFERENCES.md`](docs/REFERENCES.md).
-
-All implementation code in this repository was written for `beneath-the-stack` and is released
-under the MIT License. See [`LICENSE`](LICENSE).
-
+The repository itself is MIT licensed. External-source and classmate-study decisions are documented
+explicitly rather than inferred from repository visibility.

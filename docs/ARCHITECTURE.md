@@ -1,108 +1,148 @@
 # Architecture
 
-## Design rule
+## One hard boundary
 
-The project has one hard boundary:
+> The observer may display an experiment, but it may not become the source of the experiment's
+> truth.
 
-> An observer may display an experiment, but it may not become the source of the experiment's truth.
-
-That prevents a familiar web-development failure mode where a polished dashboard eventually hides
-that the underlying exercise is static, mocked or not reproducible.
-
-## Layers
-
-### 1. Systems core — `include/bts/`
-
-Reusable implementations written in C++20:
-
-- `hash_table.hpp` — chained and linear-probe hash tables;
-- `min_heap.hpp` — binary min-heap;
-- `graph.hpp` — adjacency-list graph + BFS/DFS/path reconstruction;
-- `counter.hpp` — synchronization experiment primitives;
-- `bplus_tree.hpp` — toy in-memory B+ tree;
-- `benchmark.hpp` — repeated timing summary;
-- `json.hpp` — dependency-free result serialization helpers;
-- `cli.hpp` — minimal experiment argument parsing.
-
-The structures do not depend on the dashboard or Python runner.
-
-### 2. Executable labs — `labs/`
-
-Each lab answers one concrete question and emits one JSON object to stdout. This makes it possible to
-run the C++ experiment directly, pipe it somewhere else, or aggregate it without coupling the core to
-a web server.
+The repository is organized so the web layer can be deleted without deleting any CS evidence.
 
 ```text
-labs/hash_table       collision/load-factor behavior
-labs/heap_scheduler   dynamic priority selection
-labs/graph_traversal  traversal/path/frontier behavior
-labs/concurrency_race compound-operation synchronization
-labs/raw_http         TCP + HTTP/1.1 connection reuse
-labs/db_index         B+ tree lookup/range/index cost
+from-scratch / POSIX core
+        ↓
+deterministic tests
+        ↓
+executable experiment
+        ↓
+benchmark / trace
+        ↓
+versioned JSON + CSV
+        ↓
+optional observer
 ```
 
-### 3. Evidence runner — `tools/run_labs.py`
+## 1. Core mechanisms — `include/bts/`
 
-The runner invokes the binaries, parses their JSON, attaches machine/compiler metadata and emits a
-single evidence document. It has two profiles:
+- `data_structures.hpp` — custom dynamic array, linked list, stack, queue, BST, trie, union-find;
+- `hash_table.hpp` — chaining and linear-probe hash tables;
+- `min_heap.hpp` — binary min-heap;
+- `graph.hpp` — adjacency-list graph, BFS/DFS and path reconstruction;
+- `counter.hpp` — logical lost-update, mutex and atomic counter primitives;
+- `http.hpp` — dependency-free HTTP request-line/header parser;
+- `bplus_tree.hpp` — in-memory B+ tree with linked leaves;
+- `toy_storage.hpp` — fixed-size row serialization, 4 KiB pager and persisted B+tree locations;
+- `embedded.hpp` — HAL boundary, deterministic simulated output and thermal state machine;
+- `benchmark.hpp`, `json.hpp`, `cli.hpp` — experiment infrastructure.
 
-- `quick` — CI/smoke scale;
-- `standard` — local release evidence scale.
+Core structures do not import the dashboard or Python runner.
 
-The runner intentionally does not calculate the algorithm result or benchmark inside Python.
+## 2. Executable labs — `labs/`
 
-### 4. Observer — `dashboard/`
+Each binary answers one narrow systems question and prints one JSON object. There are eleven in
+v0.2:
 
-Static HTML/CSS/JavaScript reads `dashboard/data/latest.json` and renders:
+```text
+hash_table        collision/load-factor/resize behavior
+heap_scheduler    dynamic priority selection
+graph_traversal   BFS/DFS frontier and path behavior
+concurrency_race  compound atomicity and coordination cost
+raw_http          parser/reuse/pool/timeout behavior on POSIX TCP
+db_index          in-memory B+tree lookup/range behavior
+data_structures   layout and failure behavior of foundational structures
+memory_locality   contiguous vs pointer-chasing access and allocation shape
+process_fd        fork/process/pipe/dup/syscall behavior
+storage_engine    fixed row → page → file → index-location lookup
+embedded_sim      simulated event → state transition → digital output
+```
 
-- collision distribution;
-- scheduler order;
-- BFS/DFS maze traversal;
-- race correctness/timing;
-- connection reuse timing;
-- sequential scan versus B+ tree timing.
+The OS/network labs are intentionally POSIX-oriented and therefore target macOS/Linux. This is
+documented as an OS-specific experiment, not portable language semantics.
 
-Deleting the dashboard does not remove any experiment capability.
+## 3. Test boundary
+
+Two deterministic suites separate old invariants from the v0.2 expansion:
+
+- `tests/system_tests.cpp` — hash/heap/graph/B+tree/concurrency/benchmark invariants;
+- `tests/mastery_tests.cpp` — dynamic-array lifetime/copy/move, list/stack/queue/BST/trie/union-find,
+  malformed HTTP parsing, persisted storage close/reopen/index equality, and embedded hysteresis.
+
+The intentionally wrong split-load/store counter is not required to return one fixed incorrect
+number. Its individual accesses are defined atomic operations; the experiment demonstrates lost
+updates caused by the compound operation not being atomic.
+
+## 4. Evidence runner — `tools/run_labs.py`
+
+The runner executes binaries and adds provenance:
+
+- hardware model and memory;
+- OS/release/architecture;
+- compiler and compile flags;
+- Python version used for orchestration;
+- source Git commit;
+- benchmark warm-up/repetitions plus p50/p95/mean/stddev/min/max.
+
+`quick` is CI/smoke scale. `standard` is the MacBook Air release profile. Release artifacts are saved
+as both JSON and normalized CSV.
+
+The runner may aggregate evidence but may not reimplement an algorithm in Python.
+
+## 5. Observer — `dashboard/`
+
+The static observer reads generated JSON. v0.2 does not grow the UI in proportion to lab count; the
+priority is implementation/test/evidence. Missing visual cards are not missing experiments.
+
+## Storage-engine boundary
+
+The v0.1 B+ tree was an in-memory index. v0.2 separates logical index structure from persisted row
+placement:
+
+```text
+ToyRow
+  ↓ serialize (128 bytes)
+4 KiB page
+  ↓ pager
+file
+  ↑ page,slot
+B+tree id index
+```
+
+The index is rebuilt by scanning persisted rows after reopen. This is deliberately simpler than a
+production database: no free-page map, WAL, crash recovery, MVCC, variable tuples or persisted index
+pages are claimed.
+
+## Product-application boundary
+
+`docs/applied-concepts.md` is a separate layer because a lab scenario is not automatically a real
+application. Mastery level 5 requires evidence outside this repository. Current examples are the
+atomic file-queue claim in `browser-reliability-runtime` and bounded history retention in
+`memory-atlas-server`.
+
+## Source-study bridge
+
+Toy systems are connected to source locations rather than copied/forked. `docs/xv6-bridge.md` maps
+process, syscall, FD, pipe, VM, lock and context-switch questions to xv6 files. The same principle is
+used for database/networking/embedded references in `docs/REFERENCES.md`.
 
 ## Benchmark contract
 
-Every benchmark function follows:
+Every timed result follows:
 
 ```text
-warm-up N times
-→ sample M repeated wall-clock durations using steady_clock
+warm-up N
+→ sample M wall-clock durations with steady_clock
 → mean / stddev / p50 / p95 / min / max
-→ emit environment with the aggregate run
+→ persist exact environment + workload
 ```
 
-The numbers are deliberately not normalized into a synthetic score. Each comparison remains tied to
-its exact workload and machine.
+Compiler-eliminated work is invalid evidence. The memory-locality lab already caught this during
+development: an initial near-zero result was discarded and the access path was changed so observable
+memory loads/touches remain in the timed region.
 
-### What the benchmarks do not prove
+## What this architecture does not claim
 
-- They do not establish universal superiority of a data structure.
-- Loopback TCP is not internet latency.
-- The B+ tree is an educational in-memory index, not PostgreSQL's storage engine.
-- Scheduler tasks are synthetic and do not model an OS kernel scheduler.
-- The counter benchmark compares one narrow workload and is not a general mutex/atomic rule.
-
-## Test boundary
-
-`tests/system_tests.cpp` tests deterministic invariants:
-
-- hash lookup/update/resize survival;
-- heap ordering;
-- BFS/DFS reachability and shortest-path reconstruction;
-- randomized B+ tree insertion, lookup and linked-leaf range scan;
-- exact mutex and atomic counter outcomes;
-- benchmark summary invariants.
-
-The intentionally race-shaped split load/store outcome is only constrained not to exceed the intended
-increment count; it is not expected to produce one deterministic wrong number.
-
-## Portability
-
-The algorithm/data-structure labs are standard C++20. The raw HTTP lab uses POSIX sockets and is
-therefore targeted at macOS/Linux in v0.1. CI runs on Ubuntu, while the release evidence is captured
-on macOS/Apple Silicon.
-
+- toy storage is not PostgreSQL;
+- the HTTP parser is not a production RFC implementation;
+- a deterministic HAL simulator is not physical embedded experience;
+- loopback networking is not internet networking;
+- synthetic scheduler tasks are not an OS kernel scheduler;
+- v0.2 is not a complete CS curriculum.

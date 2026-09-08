@@ -27,7 +27,10 @@ jobs:
         run: clang-format --dry-run --Werror $(find include labs tests -name '*.hpp' -o -name '*.cpp')
 
       - name: Quick experiment smoke test
-        run: python3 tools/run_labs.py --profile quick > /tmp/beneath-the-stack-evidence.json
+        run: |
+          python3 tools/run_labs.py --profile quick \
+            --output /tmp/beneath-the-stack-evidence.json \
+            --csv-output /tmp/beneath-the-stack-evidence.csv > /dev/null
 
       - name: Validate evidence shape
         run: |
@@ -35,12 +38,19 @@ jobs:
           import json
           with open('/tmp/beneath-the-stack-evidence.json', encoding='utf-8') as handle:
               payload = json.load(handle)
-          assert len(payload['labs']) == 6
+          assert payload['schema_version'] == 2
+          assert len(payload['labs']) == 11
           assert {lab['lab'] for lab in payload['labs']} == {
               'hash-table', 'heap-scheduler', 'graph-traversal',
-              'concurrency-race', 'raw-http', 'db-index'
+              'concurrency-race', 'raw-http', 'db-index',
+              'data-structures', 'memory-locality', 'process-fd',
+              'storage-engine', 'embedded-simulator'
           }
+          assert payload['git_commit']
+          assert payload['environment']['cxxflags']
           PY
+
+          test -s /tmp/beneath-the-stack-evidence.csv
 
       - name: CMake portability check
         run: |
