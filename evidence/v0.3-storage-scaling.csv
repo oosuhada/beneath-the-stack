@@ -1,0 +1,4 @@
+rows,queries,data_pages,index_height,leaf_splits,internal_splits,sequential_p50_ms,indexed_p50_ms,index_rebuild_p50_ms
+1000,200,32,3,61,2,5.874917,0.240959,0.101625
+10000,200,313,4,624,36,50.870333,0.261458,0.900083
+50000,200,1563,4,3124,191,286.60575,0.254417,4.886042

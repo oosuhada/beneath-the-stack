@@ -1,3 +1,73 @@
+# v0.3 benchmark evidence
+
+The v0.3 snapshot emphasizes failure modes and scaling observations rather than only one-off
+timing numbers. Raw evidence is committed as:
+
+- [`evidence/v0.3-macbook-air.json`](../evidence/v0.3-macbook-air.json)
+- [`evidence/v0.3-macbook-air.csv`](../evidence/v0.3-macbook-air.csv)
+- [`evidence/v0.3-storage-scaling.json`](../evidence/v0.3-storage-scaling.json)
+- [`evidence/v0.3-storage-scaling.csv`](../evidence/v0.3-storage-scaling.csv)
+- [`evidence/sanitizers/v0.3-macbook-air.txt`](../evidence/sanitizers/v0.3-macbook-air.txt)
+- [`evidence/assembly/`](../evidence/assembly/)
+
+## v0.3 provenance
+
+| Field | v0.3 value |
+| --- | --- |
+| Source commit measured | `8ad54f23ab4b71cd8b97e2bcdc4c44a6c55814a5` |
+| Machine | `Mac15,13`, arm64 |
+| OS | Darwin 27.0.0 |
+| Compiler | Apple clang 16.0.0 |
+| C++ flags | `-std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -pthread` |
+| Executable labs | 14 |
+| Normalized benchmark records | 42 |
+
+## v0.3 selected observations
+
+| Track | Observation | Evidence |
+| --- | --- | --- |
+| Allocator | bump allocator cannot reuse individual frees; no-coalescing free list fails the large allocation probe; coalescing succeeds | `labs/allocator/main.cpp` |
+| Allocator mixed workload | no-coalescing left **154,136 bytes** external fragmentation after drain; coalescing returned to **0 bytes** external fragmentation | `evidence/v0.3-macbook-air.json` |
+| Virtual memory | mapping 64 MiB without touch did not increase resident bytes in the sample; touching every page raised resident bytes to **68,763,648** | `labs/virtual_memory/main.cpp` |
+| Guard page | child process died with signal **10** when reading a `PROT_NONE` page | `labs/virtual_memory/main.cpp` |
+| Process pipeline | `cat file | grep apple | wc -l` produced `3` and all child exit codes were `0` | `labs/process_fd/main.cpp` |
+| Zombie observation | child exit code `23` was observable as state `Z` before `wait()` on macOS | `labs/process_fd/main.cpp` |
+| Pipe capacity | non-blocking pipe filled at **65,536 bytes** before `EAGAIN` in this run | `labs/process_fd/main.cpp` |
+| Networking | thread-per-client slow requests p50 **172.619 ms** vs serial blocking slow requests p50 **589.953 ms** | `labs/raw_http/main.cpp` |
+| Algorithm defense | BFS hop path cost **101** while Dijkstra cost **3** on the weighted fixture | `labs/algorithm_defense/main.cpp` |
+| Dynamic programming | naive Fibonacci(32) used **7,049,155** calls vs memoized **63** calls | `labs/algorithm_defense/main.cpp` |
+| Binary search | 1,000 queries on 1,000,000 sorted items: linear p50 **147.106 ms**, binary p50 **0.043 ms** | `labs/algorithm_defense/main.cpp` |
+| Storage | 4,000-row page-backed scan p50 **33.083 ms**, B+tree → page/slot lookup p50 **0.380 ms** | `labs/storage_engine/main.cpp` |
+
+## Storage scaling observation
+
+The scaling run compares the same storage lab at 1k, 10k and 50k rows. This is an empirical curve,
+not a proof of asymptotic complexity.
+
+| Rows | Data pages | Index height | Sequential lookup p50 | Indexed lookup p50 | Rebuild p50 |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1,000 | 32 | 3 | 5.875 ms | 0.241 ms | 0.102 ms |
+| 10,000 | 313 | 4 | 50.870 ms | 0.261 ms | 0.900 ms |
+| 50,000 | 1,563 | 4 | 286.606 ms | 0.254 ms | 4.886 ms |
+
+The result matches the prediction direction: page-backed sequential point lookup grows with row
+count, while the in-memory B+tree location lookup stays much flatter for this range. The index
+rebuild also grows because the toy index is rebuilt by scanning persisted pages on open. This is a
+deliberate limitation, not a PostgreSQL claim.
+
+## Sanitizer and assembly notes
+
+`tools/run_sanitizers.sh` deliberately compiles and runs two crashing programs. ASan detected the
+heap overflow fixture and UBSan detected the misaligned access fixture, both exiting with status
+134 on this machine. A separate attempt to run the full test binary with ASan leak detection failed
+because this Apple clang runtime does not support that mode, so full-test ASan coverage is not
+claimed.
+
+Assembly snapshots are stored under `evidence/assembly/`. They are used as a checkable bridge from
+C++ source to compiler output, not as a claim of complete assembly expertise.
+
+---
+
 # v0.2 benchmark evidence
 
 The v0.2 release benchmark is a **single MacBook Air observation**, not a portable performance
