@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "bts/algorithm_choice.hpp"
 #include "bts/benchmark.hpp"
 #include "bts/bplus_tree.hpp"
 #include "bts/counter.hpp"
@@ -75,6 +76,37 @@ void test_graph() {
   check(path.front() == 0 && path.back() == 6, "shortest path endpoints are correct");
 }
 
+void test_algorithm_choice_failures() {
+  bts::WeightedGraph weighted(5);
+  weighted.add_edge(0, 1, 100);
+  weighted.add_edge(1, 3, 1);
+  weighted.add_edge(0, 2, 1);
+  weighted.add_edge(2, 4, 1);
+  weighted.add_edge(4, 3, 1);
+  const auto [hop_path, hop_cost] = weighted.hop_shortest_path_and_weight(0, 3);
+  const auto shortest = weighted.dijkstra(0);
+  check(hop_path.size() == 3 && hop_cost == 101,
+        "BFS-by-hops fixture deliberately chooses fewer edges but higher weight");
+  check(shortest.distance[3] == 3, "Dijkstra finds lower weighted cost on the same graph");
+
+  const auto dag = bts::topological_sort(4, {{0, 1}, {0, 2}, {1, 3}, {2, 3}});
+  const auto cycle = bts::topological_sort(3, {{0, 1}, {1, 2}, {2, 0}});
+  check(!dag.cycle_detected && dag.order.size() == 4,
+        "Kahn topological sort emits all DAG vertices");
+  check(cycle.cycle_detected,
+        "topological sort exposes a cycle instead of returning a false ordering");
+
+  const auto naive = bts::fibonacci_naive(20);
+  const auto memoized = bts::fibonacci_memoized(20);
+  check(naive.value == memoized.value && naive.calls > memoized.calls * 100,
+        "memoized DP preserves result while eliminating repeated recursive subproblems");
+
+  const std::vector<int> sorted = {1, 3, 5, 7, 9, 11};
+  check(
+      bts::binary_search_exact(sorted, 7) == 3 && !bts::binary_search_exact(sorted, 8).has_value(),
+      "binary search implementation handles present and missing sorted targets");
+}
+
 void test_bplus_tree() {
   bts::BPlusTree<int, int> tree(8);
   std::vector<int> keys(1500);
@@ -93,6 +125,8 @@ void test_bplus_tree() {
   check(range.front().first == 144 && range.back().first == 166,
         "B+ tree range preserves sorted key order");
   check(tree.height() >= 2, "B+ tree splits root under load");
+  check(tree.leaf_split_count() > 0 && tree.internal_split_count() > 0,
+        "B+ tree exposes both leaf and internal split events under randomized load");
 }
 
 void test_concurrency_guards() {
@@ -118,6 +152,7 @@ int main() {
   test_hash_tables();
   test_heap();
   test_graph();
+  test_algorithm_choice_failures();
   test_bplus_tree();
   test_concurrency_guards();
   test_benchmark_statistics();

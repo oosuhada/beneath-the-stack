@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "bts/allocator.hpp"
 #include "bts/data_structures.hpp"
 #include "bts/embedded.hpp"
 #include "bts/http.hpp"
@@ -129,6 +130,77 @@ void test_http_parser() {
   check_throws<std::invalid_argument>(
       [&] { (void)bts::parse_http_request("GET / HTTP/2\r\nHost: localhost\r\n\r\n"); },
       "HTTP parser makes supported protocol boundary explicit");
+  check_throws<std::invalid_argument>(
+      [&] {
+        (void)bts::parse_http_request("GET / HTTP/1.1\r\nBad Header: x\r\nHost: localhost\r\n\r\n");
+      },
+      "HTTP parser rejects whitespace inside header names");
+  check_throws<std::invalid_argument>(
+      [&] { (void)bts::parse_http_request("GET / HTTP/1.1\r\nConnection: close\r\n\r\n"); },
+      "HTTP/1.1 parser requires a Host header");
+  check_throws<std::invalid_argument>(
+      [&] {
+        std::string oversized = "GET / HTTP/1.1\r\nHost: localhost\r\nX: ";
+        oversized.append(bts::kMaxHttpHeaderBytes, 'x');
+        oversized += "\r\n\r\n";
+        (void)bts::parse_http_request(oversized);
+      },
+      "HTTP parser caps header bytes before unbounded buffering becomes parser work");
+
+  std::uint64_t state = 0x5eedf00dULL;
+  std::size_t accepted_mutations = 0;
+  for (int sample = 0; sample < 500; ++sample) {
+    std::string mutated = "GET /fuzz HTTP/1.1\r\nHost: localhost\r\nX-Fuzz: value\r\n\r\n";
+    state ^= state << 13;
+    state ^= state >> 7;
+    state ^= state << 17;
+    const std::size_t index = static_cast<std::size_t>(state % mutated.size());
+    mutated[index] = static_cast<char>(state & 0x7fU);
+    try {
+      const auto parsed = bts::parse_http_request(mutated);
+      ++accepted_mutations;
+      check(parsed.version == "HTTP/1.1" && !parsed.method.empty() && !parsed.target.empty() &&
+                parsed.headers.size() <= bts::kMaxHttpHeaderCount,
+            "accepted parser mutation still satisfies parser invariants");
+    } catch (const std::invalid_argument&) {
+    }
+  }
+  check(accepted_mutations > 0 && accepted_mutations < 500,
+        "fixed-seed parser mutations exercise both accepted and rejected inputs");
+}
+
+void test_allocator() {
+  bts::FreeListAllocator allocator(4096, true);
+  void* first = allocator.allocate(31);
+  void* second = allocator.allocate(127);
+  check(first != nullptr && second != nullptr, "free-list allocator returns payloads from arena");
+  check(reinterpret_cast<std::uintptr_t>(first) % bts::FreeListAllocator::kAlignment == 0,
+        "allocator payload obeys max_align_t alignment");
+  allocator.deallocate(first);
+  void* reused = allocator.allocate(16);
+  check(reused == first, "first-fit free list reuses a released compatible block");
+  allocator.deallocate(reused);
+  allocator.deallocate(second);
+  const auto final_stats = allocator.stats();
+  check(final_stats.live_requested_bytes == 0 && final_stats.largest_free_block_bytes > 3500,
+        "coalescing restores one large free region after adjacent frees");
+  check_throws<std::invalid_argument>(
+      [&] { allocator.deallocate(second); },
+      "toy allocator detects double free instead of corrupting list");
+
+  bts::FreeListAllocator fragmented(1280, false);
+  void* a = fragmented.allocate(240);
+  void* b = fragmented.allocate(240);
+  void* c = fragmented.allocate(240);
+  void* d = fragmented.allocate(240);
+  check(a != nullptr && b != nullptr && c != nullptr && d != nullptr,
+        "fragmentation fixture fills arena with four blocks");
+  fragmented.deallocate(b);
+  fragmented.deallocate(c);
+  check(fragmented.allocate(400) == nullptr,
+        "without coalescing total free space can exist without a large enough contiguous block");
+  fragmented.deallocate(a);
+  fragmented.deallocate(d);
 }
 
 void test_toy_storage() {
@@ -188,6 +260,7 @@ int main() {
   test_linear_structures();
   test_tree_trie_union_find();
   test_http_parser();
+  test_allocator();
   test_toy_storage();
   test_embedded_simulator();
   if (failures != 0) {

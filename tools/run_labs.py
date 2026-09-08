@@ -48,9 +48,12 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
             "http_lab": ["--requests", "20", "--clients", "4", "--warmup", "1", "--repetitions", "2"],
             "btree_lab": ["--rows", "3000", "--queries", "150", "--warmup", "1", "--repetitions", "3"],
             "data_structures_lab": ["--size", "2000", "--warmup", "1", "--repetitions", "3"],
+            "algorithm_defense_lab": ["--size", "20000", "--fib", "24", "--warmup", "1", "--repetitions", "2"],
             "memory_lab": ["--size", "50000", "--warmup", "1", "--repetitions", "3"],
             "process_lab": ["--warmup", "0", "--repetitions", "3"],
+            "vm_lab": ["--mib", "8", "--warmup", "0", "--repetitions", "2"],
             "storage_lab": ["--rows", "512", "--queries", "40", "--warmup", "1", "--repetitions", "2"],
+            "allocator_lab": ["--operations", "1500", "--warmup", "1", "--repetitions", "2"],
             "embedded_lab": ["--warmup", "1", "--repetitions", "3"],
         }
     return {
@@ -61,9 +64,12 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
         "http_lab": [],
         "btree_lab": [],
         "data_structures_lab": [],
+        "algorithm_defense_lab": [],
         "memory_lab": [],
         "process_lab": [],
+        "vm_lab": [],
         "storage_lab": [],
+        "allocator_lab": [],
         "embedded_lab": [],
     }
 

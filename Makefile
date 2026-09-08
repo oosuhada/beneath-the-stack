@@ -3,12 +3,12 @@ CXXFLAGS ?= -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -pthread
 DEBUG_FLAGS ?= -std=c++20 -O0 -g -Wall -Wextra -Wpedantic -Werror -Iinclude -pthread
 
 BIN_DIR := build/bin
-LABS := hash_lab heap_lab graph_lab race_lab http_lab btree_lab data_structures_lab memory_lab process_lab storage_lab embedded_lab
+LABS := hash_lab heap_lab graph_lab race_lab http_lab btree_lab data_structures_lab algorithm_defense_lab memory_lab process_lab vm_lab storage_lab allocator_lab embedded_lab
 LAB_BINS := $(addprefix $(BIN_DIR)/,$(LABS))
 HEADERS := $(shell find include -type f -name '*.hpp')
-TEST_BINS := $(BIN_DIR)/system_tests $(BIN_DIR)/mastery_tests
+TEST_BINS := $(BIN_DIR)/system_tests $(BIN_DIR)/mastery_tests $(BIN_DIR)/differential_tests
 
-.PHONY: all clean test lint debug labs
+.PHONY: all clean test lint debug labs sanitizer assembly
 
 all: labs $(TEST_BINS)
 
@@ -38,13 +38,22 @@ $(BIN_DIR)/btree_lab: labs/db_index/main.cpp $(HEADERS) | $(BIN_DIR)
 $(BIN_DIR)/data_structures_lab: labs/data_structures/main.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
+$(BIN_DIR)/algorithm_defense_lab: labs/algorithm_defense/main.cpp $(HEADERS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
+
 $(BIN_DIR)/memory_lab: labs/memory_locality/main.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 $(BIN_DIR)/process_lab: labs/process_fd/main.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
+$(BIN_DIR)/vm_lab: labs/virtual_memory/main.cpp $(HEADERS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
+
 $(BIN_DIR)/storage_lab: labs/storage_engine/main.cpp $(HEADERS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+$(BIN_DIR)/allocator_lab: labs/allocator/main.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 $(BIN_DIR)/embedded_lab: labs/embedded_sim/main.cpp $(HEADERS) | $(BIN_DIR)
@@ -56,13 +65,18 @@ $(BIN_DIR)/system_tests: tests/system_tests.cpp $(HEADERS) | $(BIN_DIR)
 $(BIN_DIR)/mastery_tests: tests/mastery_tests.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(DEBUG_FLAGS) $< -o $@
 
+$(BIN_DIR)/differential_tests: tests/differential_tests.cpp $(HEADERS) | $(BIN_DIR)
+	$(CXX) $(DEBUG_FLAGS) $< -o $@
+
 test: $(TEST_BINS)
 	$(BIN_DIR)/system_tests
 	$(BIN_DIR)/mastery_tests
+	$(BIN_DIR)/differential_tests
 
 lint:
 	$(CXX) $(DEBUG_FLAGS) -fsyntax-only tests/system_tests.cpp
 	$(CXX) $(DEBUG_FLAGS) -fsyntax-only tests/mastery_tests.cpp
+	$(CXX) $(DEBUG_FLAGS) -fsyntax-only tests/differential_tests.cpp
 	@for src in labs/*/main.cpp; do \
 	  echo "lint $$src"; \
 	  $(CXX) $(DEBUG_FLAGS) -fsyntax-only $$src; \
@@ -71,6 +85,12 @@ lint:
 
 debug: CXXFLAGS=$(DEBUG_FLAGS)
 debug: clean all
+
+sanitizer:
+	bash tools/run_sanitizers.sh
+
+assembly:
+	bash tools/capture_assembly.sh
 
 clean:
 	rm -rf build

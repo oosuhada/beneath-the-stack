@@ -25,6 +25,8 @@
 
 namespace {
 
+enum class HandlerMode { kSerial, kThreadPerConnection };
+
 void close_socket(int fd) {
   if (fd >= 0) {
     ::close(fd);
@@ -48,7 +50,7 @@ void send_all(int fd, const std::string& payload) {
 
 class LoopbackHttpServer {
  public:
-  LoopbackHttpServer() {
+  explicit LoopbackHttpServer(HandlerMode mode = HandlerMode::kThreadPerConnection) : mode_(mode) {
     listen_fd_ = ::socket(AF_INET, SOCK_STREAM, 0);
     if (listen_fd_ < 0) {
       throw std::runtime_error("socket failed");
@@ -101,6 +103,9 @@ class LoopbackHttpServer {
 
   std::uint16_t port() const { return port_; }
   std::uint64_t request_count() const { return requests_.load(std::memory_order_relaxed); }
+  std::uint64_t accepted_connections() const { return accepted_.load(std::memory_order_relaxed); }
+  std::uint64_t bytes_received() const { return bytes_received_.load(std::memory_order_relaxed); }
+  std::uint64_t bytes_sent() const { return bytes_sent_.load(std::memory_order_relaxed); }
 
  private:
   void accept_loop() {
@@ -112,10 +117,15 @@ class LoopbackHttpServer {
         }
         continue;
       }
+      accepted_.fetch_add(1, std::memory_order_relaxed);
 #if defined(__APPLE__)
       int no_sigpipe = 1;
       ::setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &no_sigpipe, sizeof(no_sigpipe));
 #endif
+      if (mode_ == HandlerMode::kSerial) {
+        handle_connection(client);
+        continue;
+      }
       {
         std::lock_guard<std::mutex> lock(worker_mutex_);
         ++active_workers_;
@@ -142,6 +152,8 @@ class LoopbackHttpServer {
           if (received <= 0) {
             break;
           }
+          bytes_received_.fetch_add(static_cast<std::uint64_t>(received),
+                                    std::memory_order_relaxed);
           buffer.append(chunk, static_cast<std::size_t>(received));
           continue;
         }
@@ -160,6 +172,7 @@ class LoopbackHttpServer {
             "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " +
             std::to_string(body.size()) + "\r\nConnection: " + connection + "\r\n\r\n" + body;
         send_all(client, response);
+        bytes_sent_.fetch_add(response.size(), std::memory_order_relaxed);
         if (close_after) {
           break;
         }
@@ -171,9 +184,13 @@ class LoopbackHttpServer {
   }
 
   int listen_fd_ = -1;
+  HandlerMode mode_;
   std::uint16_t port_ = 0;
   std::atomic<bool> stopping_{false};
   std::atomic<std::uint64_t> requests_{0};
+  std::atomic<std::uint64_t> accepted_{0};
+  std::atomic<std::uint64_t> bytes_received_{0};
+  std::atomic<std::uint64_t> bytes_sent_{0};
   std::thread accept_thread_;
   mutable std::mutex worker_mutex_;
   std::condition_variable worker_cv_;
@@ -299,6 +316,22 @@ void run_parallel(std::uint16_t port, std::size_t clients, std::size_t requests_
   }
 }
 
+void run_slow_parallel_new_connections(std::uint16_t port, std::size_t clients) {
+  std::vector<std::thread> workers;
+  workers.reserve(clients);
+  for (std::size_t i = 0; i < clients; ++i) {
+    workers.emplace_back([=] {
+      const int fd = connect_loopback(port);
+      send_request(fd, "/slow", true);
+      read_response(fd);
+      close_socket(fd);
+    });
+  }
+  for (auto& worker : workers) {
+    worker.join();
+  }
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -320,14 +353,27 @@ int main(int argc, char** argv) {
   const auto concurrent = bts::benchmark("concurrent-keep-alive", warmup, repetitions, [&] {
     run_parallel(server.port(), clients, parallel_requests);
   });
+  const auto threaded_slow =
+      bts::benchmark("thread-per-client-slow-requests", warmup, repetitions,
+                     [&] { run_slow_parallel_new_connections(server.port(), clients); });
   const bool timeout_observed = timeout_is_observable(server.port());
+  LoopbackHttpServer serial_server(HandlerMode::kSerial);
+  const auto serial_slow =
+      bts::benchmark("serial-blocking-slow-requests", warmup, repetitions,
+                     [&] { run_slow_parallel_new_connections(serial_server.port(), clients); });
 
   std::cout << "{\"lab\":\"raw-http\",\"transport\":\"POSIX TCP loopback + hand-written HTTP/1.1 "
                "framing\",\"requests_per_run\":"
             << requests << ",\"concurrent_clients\":" << clients << ",\"pool_size\":" << pool_size
             << ",\"server_port\":" << server.port()
             << ",\"parser\":\"request-line + normalized headers\",\"timeout_observed\":"
-            << (timeout_observed ? "true" : "false") << ",\"new_connection\":";
+            << (timeout_observed ? "true" : "false")
+            << ",\"transport_counters\":{\"threaded\":{\"accepted_connections\":"
+            << server.accepted_connections() << ",\"bytes_received\":" << server.bytes_received()
+            << ",\"bytes_sent\":" << server.bytes_sent()
+            << "},\"serial\":{\"accepted_connections\":" << serial_server.accepted_connections()
+            << ",\"bytes_received\":" << serial_server.bytes_received()
+            << ",\"bytes_sent\":" << serial_server.bytes_sent() << "}},\"new_connection\":";
   bts::write_stats_json(std::cout, new_connection);
   std::cout << ",\"keep_alive\":";
   bts::write_stats_json(std::cout, keep_alive);
@@ -335,6 +381,10 @@ int main(int argc, char** argv) {
   bts::write_stats_json(std::cout, pool);
   std::cout << ",\"concurrent_keep_alive\":";
   bts::write_stats_json(std::cout, concurrent);
+  std::cout << ",\"thread_per_client_slow\":";
+  bts::write_stats_json(std::cout, threaded_slow);
+  std::cout << ",\"serial_blocking_slow\":";
+  bts::write_stats_json(std::cout, serial_slow);
   std::cout << ",\"requests_served\":" << server.request_count() << "}\n";
   return 0;
 }
