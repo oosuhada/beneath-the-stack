@@ -244,7 +244,7 @@ Machine-readable release evidence is committed as:
 
 | Field | v0.4 value |
 | --- | --- |
-| Source commit measured | `52667b79b519015def4322ffb1c2f9bf1972cad6` |
+| Source commit measured | `2a0514c57d13b7c251e1b18f662cb231b0effa0a` |
 | Executable labs | 17 |
 | Normalized benchmark records | 51 |
 
@@ -267,8 +267,8 @@ checks that the parent still sees the old byte.
 ```text
 parent_first_byte_after_child = 1
 child_first_byte_after_write  = 2
-child RSS before write        = 1,146,880 bytes
-child RSS after write         = 17,940,480 bytes
+child RSS before write        = 1,163,264 bytes
+child RSS after write         = 17,956,864 bytes
 ```
 
 This is user-space evidence for process address-space isolation and host COW behavior. It is not a
@@ -282,8 +282,8 @@ ping-pong. For the standard v0.4 workload:
 
 | Experiment | p50 |
 | --- | ---: |
-| thread condition-variable ping-pong | 2.375 ms |
-| process pipe ping-pong | 4.504 ms |
+| thread condition-variable ping-pong | 2.404 ms |
+| process pipe ping-pong | 4.231 ms |
 
 These values are a user-space proxy, not a kernel scheduler measurement. The `sample` trace in
 [`evidence/debugger/v0.4-sample-os-boundary.txt`](../evidence/debugger/v0.4-sample-os-boundary.txt)
@@ -295,8 +295,8 @@ For a 1 MiB sequential checksum fixture:
 
 | Access mode | p50 |
 | --- | ---: |
-| `read()` loop | 0.167 ms |
-| file-backed `mmap()` sequential walk | 0.299 ms |
+| `read()` loop | 0.164 ms |
+| file-backed `mmap()` sequential walk | 0.298 ms |
 
 The conclusion is not that `read()` is universally faster. In this workload the explicit read loop
 won; `mmap()` remains useful when the program benefits from addressable file contents, random access
@@ -308,8 +308,8 @@ For a 4 KiB write fixture:
 
 | Operation | p50 |
 | --- | ---: |
-| `write + close` | 0.114 ms |
-| `write + fsync + close` | 0.138 ms |
+| `write + close` | 0.122 ms |
+| `write + fsync + close` | 0.132 ms |
 
 This benchmark only records the syscall boundary cost on this machine. It does not simulate a power
 loss and does not prove data-loss behavior. The product changes use the lesson conservatively:

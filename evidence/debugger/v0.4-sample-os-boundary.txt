@@ -1,16 +1,16 @@
-Analysis of sampling os_boundary_lab (pid 86121) every 1 millisecond
-Process:         os_boundary_lab [86121]
+Analysis of sampling os_boundary_lab (pid 87295) every 1 millisecond
+Process:         os_boundary_lab [87295]
 Path:            /Users/USER/Documents/*/os_boundary_lab
-Load Address:    0x1028e0000
+Load Address:    0x100890000
 Identifier:      os_boundary_lab
 Version:         0
 Code Type:       ARM64
 Platform:        macOS
-Parent Process:  bash [86118]
+Parent Process:  bash [87291]
 Target Type:     live task
 
-Date/Time:       2026-09-08 22:43:45.747 +0900
-Launch Time:     2026-09-08 22:43:45.518 +0900
+Date/Time:       2026-09-08 22:47:01.202 +0900
+Launch Time:     2026-09-08 22:47:00.974 +0900
 OS Version:      macOS 27.0 (26A5425a)
 Report Version:  7
 Analysis Tool:   /usr/bin/sample
@@ -21,57 +21,52 @@ Idle exit:                  untracked
 ----
 
 Call graph:
-    638 Thread_1545069   DispatchQueue_1: com.apple.main-thread  (serial)
-    + 638 start  (in dyld) + 6688  [0x18a5b7e88]
-    +   459 main  (in os_boundary_lab) + 5128  [0x1028e1ad0]
-    +   ! 399 std::invoke_result<main::$_2&>::type std::invoke[abi:ne180100]<main::$_2&>(main::$_2&)  (in os_boundary_lab) + 240  [0x1028e6824]
-    +   ! : 399 (anonymous namespace)::read_exact_string(int, unsigned long)  (in os_boundary_lab) + 208  [0x1028e5a6c]
-    +   ! :   399 read  (in libsystem_kernel.dylib) + 8  [0x18a949910]
-    +   ! 58 std::invoke_result<main::$_2&>::type std::invoke[abi:ne180100]<main::$_2&>(main::$_2&)  (in os_boundary_lab) + 224  [0x1028e6814]
-    +   ! : 56 (anonymous namespace)::write_all(int, void const*, unsigned long)  (in os_boundary_lab) + 80  [0x1028e5928]
-    +   ! : | 56 write  (in libsystem_kernel.dylib) + 8  [0x18a94c838]
-    +   ! : 2 (anonymous namespace)::write_all(int, void const*, unsigned long)  (in os_boundary_lab) + 0  [0x1028e58d8]
-    +   ! 1 std::invoke_result<main::$_2&>::type std::invoke[abi:ne180100]<main::$_2&>(main::$_2&)  (in os_boundary_lab) + 68  [0x1028e6778]
-    +   ! : 1 fork  (in libsystem_c.dylib) + 56  [0x18a8393d4]
-    +   ! :   1 __fork  (in libsystem_kernel.dylib) + 20  [0x18a950958]
-    +   ! 1 std::invoke_result<main::$_2&>::type std::invoke[abi:ne180100]<main::$_2&>(main::$_2&)  (in os_boundary_lab) + 240  [0x1028e6824]
-    +   179 main  (in os_boundary_lab) + 3836  [0x1028e15c4]
-    +     147 std::invoke_result<main::$_1&>::type std::invoke[abi:ne180100]<main::$_1&>(main::$_1&)  (in os_boundary_lab) + 288  [0x1028e64cc]
-    +     : 147 std::condition_variable::wait(std::unique_lock<std::mutex>&)  (in libc++.1.dylib) + 32  [0x18a89e7bc]
-    +     :   146 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18a98e1d4]
-    +     :   | 146 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18a94c50c]
-    +     :   1 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18a98e260]
-    +     :     1 pthread_mutex_lock  (in libsystem_pthread.dylib) + 32  [0x18a9884f8]
-    +     31 std::invoke_result<main::$_1&>::type std::invoke[abi:ne180100]<main::$_1&>(main::$_1&)  (in os_boundary_lab) + 268  [0x1028e64b8]
-    +     : 31 std::condition_variable::notify_one()  (in libc++.1.dylib) + 16  [0x18a89d480]
-    +     :   30 pthread_cond_signal  (in libsystem_pthread.dylib) + 712  [0x18a98d04c]
-    +     :   | 30 __psynch_cvsignal  (in libsystem_kernel.dylib) + 8  [0x18a94da70]
-    +     :   1 pthread_cond_signal  (in libsystem_pthread.dylib) + 116  [0x18a98cdf8]
-    +     1 std::invoke_result<main::$_1&>::type std::invoke[abi:ne180100]<main::$_1&>(main::$_1&)  (in os_boundary_lab) + 312  [0x1028e64e4]
-    +       1 DYLD-STUB$$std::mutex::unlock()  (in os_boundary_lab) + 4  [0x1028e6bf4]
-    179 Thread_1545074
-      179 thread_start  (in libsystem_pthread.dylib) + 8  [0x18a988cec]
-        179 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18a98dd04]
-          166 std::__thread_proxy[abi:ne180100]<std::tuple<std::unique_ptr<std::__thread_struct>, (anonymous namespace)::thread_ping_pong(unsigned long)::$_0>>(void*)  (in os_boundary_lab) + 116  [0x1028e6658]
-          ! 166 std::condition_variable::wait(std::unique_lock<std::mutex>&)  (in libc++.1.dylib) + 32  [0x18a89e7bc]
-          !   165 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18a98e1d4]
-          !   : 165 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18a94c50c]
-          !   1 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18a98e1d4]
-          13 std::__thread_proxy[abi:ne180100]<std::tuple<std::unique_ptr<std::__thread_struct>, (anonymous namespace)::thread_ping_pong(unsigned long)::$_0>>(void*)  (in os_boundary_lab) + 164  [0x1028e6688]
-            13 std::condition_variable::notify_one()  (in libc++.1.dylib) + 16  [0x18a89d480]
-              13 pthread_cond_signal  (in libsystem_pthread.dylib) + 712  [0x18a98d04c]
-                13 __psynch_cvsignal  (in libsystem_kernel.dylib) + 8  [0x18a94da70]
+    634 Thread_1554438   DispatchQueue_1: com.apple.main-thread  (serial)
+    + 634 start  (in dyld) + 6688  [0x18a5b7e88]
+    +   443 main  (in os_boundary_lab) + 5128  [0x100891ac8]
+    +   ! 379 std::invoke_result<main::$_2&>::type std::invoke[abi:ne180100]<main::$_2&>(main::$_2&)  (in os_boundary_lab) + 240  [0x100896820]
+    +   ! : 376 (anonymous namespace)::read_exact_string(int, unsigned long)  (in os_boundary_lab) + 208  [0x100895a68]
+    +   ! : | 376 read  (in libsystem_kernel.dylib) + 8  [0x18a949910]
+    +   ! : 2 (anonymous namespace)::read_exact_string(int, unsigned long)  (in os_boundary_lab) + 208  [0x100895a68]
+    +   ! : 1 (anonymous namespace)::read_exact_string(int, unsigned long)  (in os_boundary_lab) + 148  [0x100895a2c]
+    +   ! :   1 __bzero  (in libsystem_platform.dylib) + 0  [0x18a997a30]
+    +   ! 63 std::invoke_result<main::$_2&>::type std::invoke[abi:ne180100]<main::$_2&>(main::$_2&)  (in os_boundary_lab) + 224  [0x100896810]
+    +   ! : 63 (anonymous namespace)::write_all(int, void const*, unsigned long)  (in os_boundary_lab) + 80  [0x100895924]
+    +   ! :   62 write  (in libsystem_kernel.dylib) + 8  [0x18a94c838]
+    +   ! :   1 DYLD-STUB$$write  (in os_boundary_lab) + 0  [0x100896e20]
+    +   ! 1 (anonymous namespace)::write_all(int, void const*, unsigned long)  (in os_boundary_lab) + 104  [0x10089593c]
+    +   191 main  (in os_boundary_lab) + 3836  [0x1008915bc]
+    +     158 std::invoke_result<main::$_1&>::type std::invoke[abi:ne180100]<main::$_1&>(main::$_1&)  (in os_boundary_lab) + 288  [0x1008964c8]
+    +     : 155 std::condition_variable::wait(std::unique_lock<std::mutex>&)  (in libc++.1.dylib) + 32  [0x18a89e7bc]
+    +     : | 155 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18a98e1d4]
+    +     : |   155 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18a94c50c]
+    +     : 3 std::condition_variable::wait(std::unique_lock<std::mutex>&)  (in libc++.1.dylib) + 32  [0x18a89e7bc]
+    +     33 std::invoke_result<main::$_1&>::type std::invoke[abi:ne180100]<main::$_1&>(main::$_1&)  (in os_boundary_lab) + 268  [0x1008964b4]
+    +       33 std::condition_variable::notify_one()  (in libc++.1.dylib) + 16  [0x18a89d480]
+    +         33 pthread_cond_signal  (in libsystem_pthread.dylib) + 712  [0x18a98d04c]
+    +           33 __psynch_cvsignal  (in libsystem_kernel.dylib) + 8  [0x18a94da70]
+    191 Thread_1554444
+      191 thread_start  (in libsystem_pthread.dylib) + 8  [0x18a988cec]
+        191 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18a98dd04]
+          175 std::__thread_proxy[abi:ne180100]<std::tuple<std::unique_ptr<std::__thread_struct>, (anonymous namespace)::thread_ping_pong(unsigned long)::$_0>>(void*)  (in os_boundary_lab) + 116  [0x100896654]
+          ! 175 std::condition_variable::wait(std::unique_lock<std::mutex>&)  (in libc++.1.dylib) + 32  [0x18a89e7bc]
+          !   175 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18a98e1d4]
+          !     175 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18a94c50c]
+          16 std::__thread_proxy[abi:ne180100]<std::tuple<std::unique_ptr<std::__thread_struct>, (anonymous namespace)::thread_ping_pong(unsigned long)::$_0>>(void*)  (in os_boundary_lab) + 164  [0x100896684]
+            16 std::condition_variable::notify_one()  (in libc++.1.dylib) + 16  [0x18a89d480]
+              16 pthread_cond_signal  (in libsystem_pthread.dylib) + 712  [0x18a98d04c]
+                16 __psynch_cvsignal  (in libsystem_kernel.dylib) + 8  [0x18a94da70]
 
 Total number in stack (recursive counted multiple, when >=5):
 
 Sort by top of stack, same collapsed (when >= 5):
-        read  (in libsystem_kernel.dylib)        399
-        __psynch_cvwait  (in libsystem_kernel.dylib)        311
-        write  (in libsystem_kernel.dylib)        56
-        __psynch_cvsignal  (in libsystem_kernel.dylib)        43
+        read  (in libsystem_kernel.dylib)        376
+        __psynch_cvwait  (in libsystem_kernel.dylib)        330
+        write  (in libsystem_kernel.dylib)        62
+        __psynch_cvsignal  (in libsystem_kernel.dylib)        49
 
 Binary Images:
-       0x1028e0000 -        0x1028e7ff3 +os_boundary_lab (0) <1906EEF6-63A9-3807-BA6D-95DAEEA12C6F> /Users/*/Documents/*/os_boundary_lab
+       0x100890000 -        0x100897ff3 +os_boundary_lab (0) <802080CA-B30A-3D6E-BA69-1F4DEBDEE441> /Users/*/Documents/*/os_boundary_lab
        0x18a504000 -        0x18a553527  libobjc.A.dylib (973.1) <220ABA7C-1B27-3461-AD64-F0C02DA55A5B> /usr/lib/libobjc.A.dylib
        0x18a554000 -        0x18a55e23f  libsharedcache.dylib (0) <10B20858-73AC-3AB6-AEE8-B6E7243D386E> /usr/lib/libsharedcache.dylib
        0x18a55f000 -        0x18a585ceb  libdyld.dylib (27062) <2DE7C10A-5A74-3F3F-93B6-5ABA1D64F9B7> /usr/lib/system/libdyld.dylib
