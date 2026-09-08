@@ -18,11 +18,11 @@
         {"topic": "stack / queue", "level": 3, "artifacts": ["include/bts/data_structures.hpp", "tests/mastery_tests.cpp"]},
         {"topic": "hash table", "level": 4, "artifacts": ["include/bts/hash_table.hpp", "tests/system_tests.cpp", "labs/hash_table/main.cpp", "docs/interview/hash-table.md"]},
         {"topic": "binary search tree", "level": 4, "artifacts": ["include/bts/data_structures.hpp", "tests/mastery_tests.cpp", "labs/data_structures/main.cpp", "docs/interview/data-structures.md"]},
-        {"topic": "heap / priority queue", "level": 4, "artifacts": ["include/bts/min_heap.hpp", "tests/system_tests.cpp", "labs/heap_scheduler/main.cpp", "docs/interview/heap-priority-queue.md"]},
+        {"topic": "heap / priority queue", "level": 4, "artifacts": ["include/bts/min_heap.hpp", "tests/system_tests.cpp", "tests/differential_tests.cpp", "labs/heap_scheduler/main.cpp", "docs/interview/heap-priority-queue.md"]},
         {"topic": "trie", "level": 4, "artifacts": ["include/bts/data_structures.hpp", "tests/mastery_tests.cpp", "labs/data_structures/main.cpp"]},
         {"topic": "graph", "level": 4, "artifacts": ["include/bts/graph.hpp", "tests/system_tests.cpp", "labs/graph_traversal/main.cpp"]},
         {"topic": "union-find", "level": 4, "artifacts": ["include/bts/data_structures.hpp", "tests/mastery_tests.cpp", "labs/data_structures/main.cpp"]},
-        {"topic": "B+ tree", "level": 4, "artifacts": ["include/bts/bplus_tree.hpp", "tests/system_tests.cpp", "labs/db_index/main.cpp", "docs/interview/bplus-tree.md"]},
+        {"topic": "B+ tree", "level": 4, "artifacts": ["include/bts/bplus_tree.hpp", "tests/system_tests.cpp", "tests/differential_tests.cpp", "labs/db_index/main.cpp", "docs/interview/bplus-tree.md"]},
         {"topic": "LRU cache", "level": 0, "artifacts": []}
       ]
     },
@@ -46,12 +46,12 @@
     {
       "name": "Operating Systems",
       "topics": [
-        {"topic": "process / fork isolation", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/interview/process-fd.md", "docs/xv6-bridge.md"]},
-        {"topic": "file descriptor / dup shared offset", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/interview/process-fd.md", "docs/xv6-bridge.md"]},
+        {"topic": "process / fork isolation", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/notebook/2026-09-08-os-process-fd-pipe.md", "docs/interview/process-fd.md", "docs/source-reading/xv6-process-fd-vm.md"]},
+        {"topic": "file descriptor / dup shared offset", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/notebook/2026-09-08-os-process-fd-pipe.md", "docs/interview/process-fd.md", "docs/source-reading/xv6-process-fd-vm.md"]},
         {"topic": "syscall boundary", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/interview/process-fd.md", "docs/xv6-bridge.md"]},
-        {"topic": "virtual memory / page table", "level": 1, "artifacts": ["docs/xv6-bridge.md", "docs/ROADMAP.md"]},
+        {"topic": "virtual memory / page table", "level": 4, "artifacts": ["labs/virtual_memory/main.cpp", "docs/notebook/2026-09-08-os-process-fd-pipe.md", "docs/source-reading/xv6-process-fd-vm.md", "evidence/v0.3-macbook-air.json"]},
         {"topic": "context switch / scheduler", "level": 1, "artifacts": ["docs/xv6-bridge.md", "docs/ROADMAP.md"]},
-        {"topic": "pipe", "level": 2, "artifacts": ["labs/process_fd/main.cpp", "docs/xv6-bridge.md"]}
+        {"topic": "pipe", "level": 4, "artifacts": ["labs/process_fd/main.cpp", "docs/notebook/2026-09-08-os-process-fd-pipe.md", "docs/source-reading/xv6-process-fd-vm.md"]}
       ]
     },
     {
@@ -59,9 +59,9 @@
       "topics": [
         {"topic": "contiguous locality vs pointer chasing", "level": 5, "artifacts": ["labs/memory_locality/main.cpp", "docs/interview/memory-locality.md", "docs/applied-concepts.md", "https://github.com/oosuhada/memory-atlas-server/blob/main/src/MessageHistory.cpp"]},
         {"topic": "stack frame vs heap allocation", "level": 4, "artifacts": ["labs/memory_locality/main.cpp", "docs/interview/memory-locality.md"]},
-        {"topic": "allocator fragmentation", "level": 1, "artifacts": ["docs/ROADMAP.md"]},
+        {"topic": "allocator fragmentation", "level": 4, "artifacts": ["include/bts/allocator.hpp", "labs/allocator/main.cpp", "tests/mastery_tests.cpp", "tests/differential_tests.cpp", "docs/notebook/2026-09-08-allocator-fragmentation.md", "evidence/assembly/allocator-O0.s", "evidence/assembly/allocator-O2.s"]},
         {"topic": "CPU cache / branch behavior", "level": 1, "artifacts": ["docs/ROADMAP.md"]},
-        {"topic": "generated assembly", "level": 0, "artifacts": []}
+        {"topic": "generated assembly", "level": 2, "artifacts": ["evidence/assembly/allocator-O0.s", "evidence/assembly/allocator-O2.s", "docs/notebook/2026-09-08-allocator-fragmentation.md"]}
       ]
     },
     {
@@ -78,10 +78,11 @@
       "name": "Networking",
       "topics": [
         {"topic": "raw TCP socket lifecycle", "level": 4, "artifacts": ["labs/raw_http/main.cpp", "docs/interview/tcp-http.md"]},
-        {"topic": "HTTP/1.1 request parsing", "level": 3, "artifacts": ["include/bts/http.hpp", "tests/mastery_tests.cpp", "labs/raw_http/main.cpp", "docs/interview/tcp-http.md"]},
+        {"topic": "HTTP/1.1 request parsing", "level": 4, "artifacts": ["include/bts/http.hpp", "tests/mastery_tests.cpp", "labs/raw_http/main.cpp", "docs/notebook/2026-09-08-network-blocking-http.md", "docs/interview/tcp-http.md"]},
         {"topic": "HTTP keep-alive", "level": 4, "artifacts": ["labs/raw_http/main.cpp", "docs/interview/tcp-http.md"]},
         {"topic": "connection pooling", "level": 4, "artifacts": ["labs/raw_http/main.cpp", "docs/interview/tcp-http.md"]},
-        {"topic": "socket receive timeout", "level": 3, "artifacts": ["labs/raw_http/main.cpp", "docs/interview/tcp-http.md"]},
+        {"topic": "socket receive timeout", "level": 4, "artifacts": ["labs/raw_http/main.cpp", "docs/notebook/2026-09-08-network-blocking-http.md", "docs/interview/tcp-http.md"]},
+        {"topic": "blocking vs threaded request handling", "level": 4, "artifacts": ["labs/raw_http/main.cpp", "docs/notebook/2026-09-08-network-blocking-http.md", "docs/adr/ADR-006-blocking-sockets-before-event-loop.md"]},
         {"topic": "retry / backoff", "level": 1, "artifacts": ["docs/applied-concepts.md", "docs/ROADMAP.md"]},
         {"topic": "UDP / DNS", "level": 0, "artifacts": []}
       ]
@@ -91,8 +92,9 @@
       "topics": [
         {"topic": "B+ tree index", "level": 4, "artifacts": ["include/bts/bplus_tree.hpp", "labs/db_index/main.cpp", "docs/interview/bplus-tree.md"]},
         {"topic": "fixed-row serialization", "level": 4, "artifacts": ["include/bts/toy_storage.hpp", "tests/mastery_tests.cpp", "labs/storage_engine/main.cpp", "docs/interview/storage-engine.md"]},
-        {"topic": "4 KiB page / pager", "level": 4, "artifacts": ["include/bts/toy_storage.hpp", "tests/mastery_tests.cpp", "labs/storage_engine/main.cpp", "docs/interview/storage-engine.md"]},
+        {"topic": "4 KiB page / pager", "level": 5, "artifacts": ["include/bts/toy_storage.hpp", "tests/mastery_tests.cpp", "labs/storage_engine/main.cpp", "docs/interview/storage-engine.md", "https://github.com/oosuhada/browser-reliability-runtime/blob/main/src/local-llm/queue.ts"]},
         {"topic": "persisted index rebuild", "level": 4, "artifacts": ["include/bts/toy_storage.hpp", "tests/mastery_tests.cpp", "labs/storage_engine/main.cpp"]},
+        {"topic": "PostgreSQL source bridge", "level": 2, "artifacts": ["docs/source-reading/postgres-pages-btree.md", "docs/notebook/2026-09-08-storage-page-index-scaling.md"]},
         {"topic": "PostgreSQL EXPLAIN / BUFFERS", "level": 1, "artifacts": ["docs/ROADMAP.md", "docs/applied-concepts.md"]},
         {"topic": "MVCC / isolation / WAL", "level": 0, "artifacts": []}
       ]
