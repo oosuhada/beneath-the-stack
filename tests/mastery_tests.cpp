@@ -148,11 +148,9 @@ void test_toy_storage() {
     const auto range = table.range_indexed(30, 39);
     check(range.size() == 10 && range.front().id == 30 && range.back().id == 39,
           "linked B+tree leaves drive persisted range reads");
-    check_throws<std::invalid_argument>(
-        [&] {
-          table.insert(bts::ToyRow{63, "duplicate", "duplicate@example.test"});
-        },
-        "toy table prevents duplicate primary key in index");
+    const bts::ToyRow duplicate{63, "duplicate", "duplicate@example.test"};
+    check_throws<std::invalid_argument>([&] { table.insert(duplicate); },
+                                        "toy table prevents duplicate primary key in index");
   }
   {
     bts::ToyTable reopened(path);
