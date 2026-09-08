@@ -233,3 +233,114 @@ python3 tools/run_labs.py \
 
 For a new measurement, do not overwrite this release file unless the source commit/environment is
 also being versioned as a new evidence snapshot.
+
+## v0.4 OS-boundary evidence
+
+v0.4 narrows the benchmark story around user-space calls meeting kernel-maintained abstractions.
+Machine-readable release evidence is committed as:
+
+- [`evidence/v0.4-macbook-air.json`](../evidence/v0.4-macbook-air.json)
+- [`evidence/v0.4-macbook-air.csv`](../evidence/v0.4-macbook-air.csv)
+
+| Field | v0.4 value |
+| --- | --- |
+| Source commit measured | `52667b79b519015def4322ffb1c2f9bf1972cad6` |
+| Executable labs | 17 |
+| Normalized benchmark records | 51 |
+
+### Syscall / file-descriptor identity
+
+The new `os-boundary` lab records that macOS treats raw `syscall(2)` as deprecated, so this portable
+build uses the supported libc `write()` wrapper and records that limitation rather than suppressing
+the warning. The same lab still observes the fd/open-file distinction:
+
+| Fixture | Parent read | Child read | Interpretation |
+| --- | --- | --- | --- |
+| inherited fd after `fork()` | `ab` | `cd` | parent and child share the same open-file offset |
+| independent reopen into fd 3 | `ab` | `ab` | same descriptor number does not imply same open-file object |
+
+### Copy-on-write style observation
+
+The host OS experiment maps and touches 1,024 pages, forks, has the child write each page, and then
+checks that the parent still sees the old byte.
+
+```text
+parent_first_byte_after_child = 1
+child_first_byte_after_write  = 2
+child RSS before write        = 1,146,880 bytes
+child RSS after write         = 17,940,480 bytes
+```
+
+This is user-space evidence for process address-space isolation and host COW behavior. It is not a
+claim that baseline xv6 implements COW; the source-reading note explicitly points out xv6's eager
+`uvmcopy()` path.
+
+### Context-switch proxy
+
+The lab compares a no-switch loop with thread condition-variable ping-pong and process pipe
+ping-pong. For the standard v0.4 workload:
+
+| Experiment | p50 |
+| --- | ---: |
+| thread condition-variable ping-pong | 2.375 ms |
+| process pipe ping-pong | 4.504 ms |
+
+These values are a user-space proxy, not a kernel scheduler measurement. The `sample` trace in
+[`evidence/debugger/v0.4-sample-os-boundary.txt`](../evidence/debugger/v0.4-sample-os-boundary.txt)
+shows the program in `read`, `write` and pthread condition-variable paths.
+
+### `read()` vs `mmap()`
+
+For a 1 MiB sequential checksum fixture:
+
+| Access mode | p50 |
+| --- | ---: |
+| `read()` loop | 0.167 ms |
+| file-backed `mmap()` sequential walk | 0.299 ms |
+
+The conclusion is not that `read()` is universally faster. In this workload the explicit read loop
+won; `mmap()` remains useful when the program benefits from addressable file contents, random access
+or OS page-cache behavior that matches the access pattern.
+
+### Durability boundary
+
+For a 4 KiB write fixture:
+
+| Operation | p50 |
+| --- | ---: |
+| `write + close` | 0.114 ms |
+| `write + fsync + close` | 0.138 ms |
+
+This benchmark only records the syscall boundary cost on this machine. It does not simulate a power
+loss and does not prove data-loss behavior. The product changes use the lesson conservatively:
+small queue state files get explicit sync/rename boundaries, while chat-history fsync is opt-in.
+
+### Scheduler policy simulator
+
+The scheduler lab uses a deterministic convoy workload. It is not the macOS scheduler. Its purpose is
+to connect xv6's `RUNNABLE -> RUNNING -> swtch()` source reading to policy trade-offs.
+
+| Policy | Notable observation |
+| --- | --- |
+| FIFO | max waiting = 69 |
+| Round robin | max waiting = 45 on the same workload |
+| Non-preemptive priority | long low-priority job waits 43 |
+| Shortest-job-first | mean turnaround = 14.4667 |
+
+The first round-robin implementation produced impossible unsigned waiting values because the running
+job could be re-enqueued while still executing. That bug and fix are recorded in the v0.4 OS
+notebook.
+
+### Toy filesystem
+
+The toy filesystem lab models path lookup as directory entries pointing to inode-like metadata and
+fixed-size blocks:
+
+```text
+same_inode_for_hard_link = true
+reference_count          = 2
+block_count              = 4
+traversal_rejected       = true
+```
+
+This is a model of identity and lookup, not a production filesystem.

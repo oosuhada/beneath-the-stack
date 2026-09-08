@@ -1,0 +1,7 @@
+sample_status=0
+lab_status=0
+sample stdout:
+sample stderr:
+Sampling process 86121 for 1 second with 1 millisecond of run time between samples
+Sampling completed, processing symbols...
+Sample analysis of process 86121 written to file evidence/debugger/v0.4-sample-os-boundary.txt
