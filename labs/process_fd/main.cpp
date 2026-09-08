@@ -106,24 +106,24 @@ void fork_and_wait() {
 int main(int argc, char** argv) {
   const std::size_t warmup = bts::size_argument(argc, argv, "--warmup", 1);
   const std::size_t repetitions = bts::size_argument(argc, argv, "--repetitions", 12);
+  constexpr int kCallsPerSample = 1000000;
   int parent_local = 7;
   const ChildObservation child = process_isolation_experiment(parent_local);
   const auto [first, second] = duplicated_descriptor_offset_experiment();
   std::atomic<pid_t> sink{0};
-  const pid_t cached_pid = ::getpid();
+  volatile pid_t cached_pid = ::getpid();
 
   const auto getpid_stats = bts::benchmark("getpid-call", warmup, repetitions, [&] {
     pid_t value = 0;
-    for (int i = 0; i < 10000; ++i) {
+    for (int i = 0; i < kCallsPerSample; ++i) {
       value = ::getpid();
     }
     sink.store(value, std::memory_order_relaxed);
   });
   const auto cached_stats = bts::benchmark("cached-pid-load", warmup, repetitions, [&] {
     pid_t value = 0;
-    for (int i = 0; i < 10000; ++i) {
+    for (int i = 0; i < kCallsPerSample; ++i) {
       value = cached_pid;
-      std::atomic_signal_fence(std::memory_order_seq_cst);
     }
     sink.store(value, std::memory_order_relaxed);
   });
@@ -134,7 +134,8 @@ int main(int argc, char** argv) {
       << ::getpid() << ",\"child_pid\":" << child.pid
       << ",\"child_parent_pid\":" << child.parent_pid << ",\"parent_local_after\":" << parent_local
       << ",\"child_local\":" << child.local_value << "},\"dup_shared_offset\":{\"first_read\":\""
-      << first << "\",\"second_read\":\"" << second << "\"},\"getpid\":";
+      << first << "\",\"second_read\":\"" << second
+      << "\"},\"calls_per_sample\":" << kCallsPerSample << ",\"getpid\":";
   bts::write_stats_json(std::cout, getpid_stats);
   std::cout << ",\"cached_pid\":";
   bts::write_stats_json(std::cout, cached_stats);
