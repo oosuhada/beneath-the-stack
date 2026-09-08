@@ -110,6 +110,24 @@ python3 tools/run_labs.py \
 See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for release observations and their limitations.
 Numbers in this repository are workload-specific observations, not hardware-independent truths.
 
+Selected v0.2 MacBook Air observations:
+
+| Experiment | p50 |
+| --- | ---: |
+| Heap scheduler, 2,500 tasks | 0.135 ms |
+| Repeated linear minimum, same tasks | 6.002 ms |
+| HTTP new connection ×80 loopback requests | 4.340 ms |
+| HTTP keep-alive ×80 | 1.204 ms |
+| 200,000 contiguous value traversal | 0.054 ms |
+| 200,000 linked pointer chase | 0.088 ms |
+| 1,000,000 `getpid()` calls | 1.089 ms |
+| 1,000,000 volatile cached PID loads | 0.272 ms |
+| 300 page-backed sequential point queries / 4,000 rows | 33.320 ms |
+| 300 B+tree → page/slot queries / same rows | 0.375 ms |
+
+The evidence file points to source commit `8a6d49598a5237ea92410a36f36555218619d570` so the measured
+code can be distinguished from later documentation/evidence commits.
+
 Examples of claims this project deliberately **does not** make:
 
 - a toy B+ tree is PostgreSQL;
