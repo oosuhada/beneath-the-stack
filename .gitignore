@@ -1,0 +1,6 @@
+build/
+dashboard/data/latest.json
+evidence/local-*.json
+*.dSYM/
+.DS_Store
+

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>beneath-the-stack · lab observer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">LOCAL SYSTEMS INSTRUMENT · OBSERVER ONLY</p>
+          <h1>beneath-the-stack</h1>
+          <p class="lede">
+            C++ experiments first. Measurements second. This browser only renders evidence emitted by
+            the lab binaries.
+          </p>
+        </div>
+        <div class="run-meta" id="run-meta">
+          <span class="status-dot"></span>
+          loading evidence
+        </div>
+      </header>
+
+      <section class="principle">
+        <span>IMPLEMENT</span><i>→</i><span>BREAK</span><i>→</i><span>MEASURE</span><i>→</i
+        ><span>EXPLAIN</span>
+      </section>
+
+      <div id="error" class="error" hidden></div>
+
+      <section class="lab-grid" id="labs" hidden>
+        <article class="panel wide" id="hash-panel">
+          <div class="panel-head">
+            <div><p class="index">01</p><h2>Hash table</h2></div>
+            <p class="tag">collision / load factor</p>
+          </div>
+          <div class="metric-row" id="hash-metrics"></div>
+          <div class="chart-block">
+            <p class="chart-label">CHAIN LENGTH → NUMBER OF BUCKETS</p>
+            <div class="bar-chart" id="hash-bars"></div>
+          </div>
+        </article>
+
+        <article class="panel" id="heap-panel">
+          <div class="panel-head">
+            <div><p class="index">02</p><h2>Heap scheduler</h2></div>
+            <p class="tag">priority queue</p>
+          </div>
+          <div class="metric-row" id="heap-metrics"></div>
+          <p class="chart-label">EXECUTION ORDER · EARLIEST DEADLINE FIRST</p>
+          <div class="task-trace" id="heap-trace"></div>
+        </article>
+
+        <article class="panel" id="race-panel">
+          <div class="panel-head">
+            <div><p class="index">03</p><h2>Concurrency</h2></div>
+            <p class="tag">lost update / mutex / atomic</p>
+          </div>
+          <div class="metric-row" id="race-metrics"></div>
+          <div class="compare-bars" id="race-bars"></div>
+        </article>
+
+        <article class="panel wide" id="graph-panel">
+          <div class="panel-head">
+            <div><p class="index">04</p><h2>BFS / DFS</h2></div>
+            <p class="tag">path / frontier</p>
+          </div>
+          <div class="graph-layout">
+            <div class="maze" id="maze"></div>
+            <div>
+              <div class="metric-row vertical" id="graph-metrics"></div>
+              <p class="legend"><span class="swatch path"></span>BFS shortest path</p>
+              <p class="legend"><span class="swatch wall"></span>blocked cell</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" id="http-panel">
+          <div class="panel-head">
+            <div><p class="index">05</p><h2>Raw TCP / HTTP</h2></div>
+            <p class="tag">connection reuse</p>
+          </div>
+          <div class="metric-row" id="http-metrics"></div>
+          <div class="compare-bars" id="http-bars"></div>
+        </article>
+
+        <article class="panel" id="db-panel">
+          <div class="panel-head">
+            <div><p class="index">06</p><h2>B+ tree index</h2></div>
+            <p class="tag">scan / lookup / build</p>
+          </div>
+          <div class="metric-row" id="db-metrics"></div>
+          <div class="compare-bars" id="db-bars"></div>
+        </article>
+      </section>
+
+      <footer>
+        <p>Evidence file: <code>dashboard/data/latest.json</code></p>
+        <p>Regenerate with <code>python3 tools/run_labs.py --profile standard --dashboard-data</code></p>
+      </footer>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
+

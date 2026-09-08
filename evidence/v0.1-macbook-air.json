@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "project": "beneath-the-stack",
+  "release": "v0.1",
+  "captured_at_utc": "2026-09-08T09:40:28.323617+00:00",
+  "profile": "standard",
+  "environment": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "model": "Mac15,13",
+    "memory_bytes": 25769803776,
+    "compiler": "Apple clang version 16.0.0 (clang-1600.0.26.3)",
+    "python": "3.14.6"
+  },
+  "method": {
+    "clock": "steady_clock",
+    "summary": "Warm-up followed by repeated wall-clock samples. Values are local observations, not hardware-independent claims."
+  },
+  "labs": [
+    {
+      "lab": "hash-table",
+      "items": 20000,
+      "warmup": 3,
+      "repetitions": 15,
+      "chaining": {
+        "bucket_count": 32768,
+        "load_factor": 0.610352,
+        "max_chain": 6,
+        "bucket_histogram": [17827, 10808, 3330, 691, 102, 9, 1],
+        "insert_p50_ms": 3.130542,
+        "insert_p95_ms": 4.092404,
+        "lookup_p50_ms": 0.606583,
+        "lookup_p95_ms": 0.643291
+      },
+      "open_addressing": {
+        "capacity": 32768,
+        "load_factor": 0.610352,
+        "longest_cluster": 56,
+        "insert_p50_ms": 2.484458,
+        "insert_p95_ms": 2.513237,
+        "lookup_p50_ms": 0.692959,
+        "lookup_p95_ms": 0.715233
+      }
+    },
+    {
+      "lab": "heap-scheduler",
+      "tasks": 2500,
+      "warmup": 2,
+      "repetitions": 10,
+      "heap_p50_ms": 0.233229,
+      "heap_p95_ms": 0.245014,
+      "linear_min_p50_ms": 5.709354,
+      "linear_min_p95_ms": 7.490492
+    },
+    {
+      "lab": "graph-traversal",
+      "benchmark_grid": [120, 120],
+      "warmup": 3,
+      "repetitions": 20,
+      "bfs_p50_ms": 0.086021,
+      "bfs_p95_ms": 0.088635,
+      "dfs_p50_ms": 0.075083,
+      "dfs_p95_ms": 0.080072,
+      "demo_bfs_peak_frontier_nodes": 9,
+      "demo_dfs_peak_frontier_nodes": 32
+    },
+    {
+      "lab": "concurrency-race",
+      "threads": 8,
+      "increments_per_thread": 100000,
+      "expected": 800000,
+      "warmup": 1,
+      "repetitions": 6,
+      "split_load_store": {
+        "observed": 138209,
+        "p50_ms": 0.768979,
+        "p95_ms": 0.798135,
+        "correct": false
+      },
+      "mutex": {
+        "observed": 800000,
+        "p50_ms": 15.523937,
+        "p95_ms": 15.818074,
+        "correct": true
+      },
+      "atomic_fetch_add": {
+        "observed": 800000,
+        "p50_ms": 13.734438,
+        "p95_ms": 14.661333,
+        "correct": true
+      }
+    },
+    {
+      "lab": "raw-http",
+      "requests_per_run": 80,
+      "concurrent_clients": 4,
+      "warmup": 2,
+      "repetitions": 8,
+      "new_connection_p50_ms": 4.210897,
+      "new_connection_p95_ms": 5.303936,
+      "keep_alive_p50_ms": 1.195563,
+      "keep_alive_p95_ms": 1.229810,
+      "concurrent_keep_alive_p50_ms": 0.468249,
+      "concurrent_keep_alive_p95_ms": 0.550058
+    },
+    {
+      "lab": "db-index",
+      "rows": 12000,
+      "queries": 600,
+      "order": 32,
+      "tree_height": 3,
+      "leaf_count": 556,
+      "warmup": 2,
+      "repetitions": 10,
+      "index_build_p50_ms": 0.890292,
+      "index_build_p95_ms": 0.954894,
+      "sequential_scan_p50_ms": 0.921521,
+      "sequential_scan_p95_ms": 0.949869,
+      "bplus_tree_p50_ms": 0.015395,
+      "bplus_tree_p95_ms": 0.024302,
+      "range_scan": {
+        "from": 4000,
+        "to": 4024,
+        "returned": 25
+      }
+    }
+  ]
+}
+

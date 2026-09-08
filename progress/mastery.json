@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "stages": ["learned", "implemented", "benchmarked", "explained", "applied"],
+  "domains": [
+    {
+      "name": "Data Structures",
+      "topics": [
+        {"topic": "hash table", "learned": true, "implemented": true, "benchmarked": true, "explained": true, "applied": true},
+        {"topic": "heap / priority queue", "learned": true, "implemented": true, "benchmarked": true, "explained": true, "applied": true},
+        {"topic": "B+ tree", "learned": true, "implemented": true, "benchmarked": true, "explained": true, "applied": true},
+        {"topic": "linked list", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "BST", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false}
+      ]
+    },
+    {
+      "name": "Algorithms",
+      "topics": [
+        {"topic": "BFS / DFS", "learned": true, "implemented": true, "benchmarked": true, "explained": true, "applied": true},
+        {"topic": "binary search", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "sorting", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "greedy", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "basic dynamic programming", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false}
+      ]
+    },
+    {
+      "name": "Concurrency",
+      "topics": [
+        {"topic": "race condition / mutex / atomic", "learned": true, "implemented": true, "benchmarked": true, "explained": true, "applied": true},
+        {"topic": "semaphore", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "deadlock", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false}
+      ]
+    },
+    {
+      "name": "Networking",
+      "topics": [
+        {"topic": "raw TCP / HTTP keep-alive", "learned": true, "implemented": true, "benchmarked": true, "explained": true, "applied": true},
+        {"topic": "UDP", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "DNS", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "connection pooling", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false}
+      ]
+    },
+    {
+      "name": "Database Internals",
+      "topics": [
+        {"topic": "index structure / B+ tree", "learned": true, "implemented": true, "benchmarked": true, "explained": true, "applied": true},
+        {"topic": "PostgreSQL EXPLAIN ANALYZE", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "MVCC / isolation / WAL", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false}
+      ]
+    },
+    {
+      "name": "Operating Systems",
+      "topics": [
+        {"topic": "process / thread", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "stack / heap / allocator", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "virtual memory / pages", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "syscall / file descriptor", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false}
+      ]
+    },
+    {
+      "name": "Systems Programming",
+      "topics": [
+        {"topic": "C++20 low-level lab runtime", "learned": true, "implemented": true, "benchmarked": true, "explained": true, "applied": true},
+        {"topic": "async I/O", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false}
+      ]
+    },
+    {
+      "name": "Embedded / Hardware",
+      "topics": [
+        {"topic": "HAL simulator", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false},
+        {"topic": "physical GPIO / serial / interrupt", "learned": false, "implemented": false, "benchmarked": false, "explained": false, "applied": false}
+      ]
+    }
+  ]
+}
+
