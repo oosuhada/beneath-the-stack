@@ -222,9 +222,9 @@ SyscallBoundaryObservation direct_syscall_write_experiment() {
   close_fd(channel[1]);
   const std::string observed = read_exact_string(channel[0], sizeof(payload) - 1);
   close_fd(channel[0]);
+  const auto expected = static_cast<std::int64_t>(sizeof(payload) - 1);
   return SyscallBoundaryObservation{
-      direct_syscall_used,
-      written == static_cast<decltype(written)>(sizeof(payload) - 1) && observed == "syscall",
+      direct_syscall_used, static_cast<std::int64_t>(written) == expected && observed == "syscall",
       limitation};
 }
 
