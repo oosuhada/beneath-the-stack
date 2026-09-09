@@ -11,6 +11,8 @@
 
 #include "bts/allocator.hpp"
 #include "bts/bplus_tree.hpp"
+#include "bts/durable_job_runtime.hpp"
+#include "bts/firmware.hpp"
 #include "bts/hash_table.hpp"
 #include "bts/min_heap.hpp"
 
@@ -146,6 +148,39 @@ void test_allocator_randomized_invariants() {
         "coalescing recovers a single arena block after randomized workload drains");
 }
 
+void test_capstone_parser_fuzz_does_not_emit_invalid_commands() {
+  std::mt19937_64 random(0x43415053544f4e45ULL);
+  std::size_t accepted_commands = 0;
+  for (int case_index = 0; case_index < 2000; ++case_index) {
+    std::vector<std::uint8_t> bytes;
+    if (case_index % 17 == 0) {
+      const auto command = bts::encode_submit_command(
+          {"fuzz-" + std::to_string(case_index), static_cast<int>(case_index % 5), 1, "body"});
+      bytes = bts::encode_frame(
+          bts::SerialFrame{0x31U, std::vector<std::uint8_t>(command.begin(), command.end())});
+    } else {
+      const std::size_t size = static_cast<std::size_t>(random() % 80U);
+      bytes.resize(size);
+      for (auto& byte : bytes) {
+        byte = static_cast<std::uint8_t>(random() & 0xffU);
+      }
+    }
+
+    bts::ProtocolParser parser(96);
+    for (const auto byte : bytes) {
+      bts::SerialFrame frame;
+      if (parser.feed(byte, frame)) {
+        const std::string payload(frame.payload.begin(), frame.payload.end());
+        if (bts::parse_submit_command(payload)) {
+          ++accepted_commands;
+        }
+      }
+    }
+  }
+  check(accepted_commands >= 118,
+        "capstone parser fuzz accepts only the deliberately inserted valid submit frames");
+}
+
 }  // namespace
 
 int main() {
@@ -153,6 +188,7 @@ int main() {
   test_hash_tables_against_unordered_map();
   test_bplus_tree_against_map();
   test_allocator_randomized_invariants();
+  test_capstone_parser_fuzz_does_not_emit_invalid_commands();
   if (failures != 0) {
     std::cerr << failures << " differential/property test(s) failed\n";
     return 1;

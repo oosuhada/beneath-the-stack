@@ -1,3 +1,167 @@
+# v0.7 real-systems validation evidence
+
+v0.7 checks the remaining gap between toy/control experiments and real runtimes. Raw evidence is
+committed as:
+
+- [`evidence/v0.7-macbook-air.json`](../evidence/v0.7-macbook-air.json)
+- [`evidence/v0.7-macbook-air.csv`](../evidence/v0.7-macbook-air.csv)
+- [`evidence/v0.7-postgres-reality.json`](../evidence/v0.7-postgres-reality.json)
+- [`evidence/v0.7-capstone-campaign.json`](../evidence/v0.7-capstone-campaign.json)
+- [`evidence/debugger/v0.7-debugging-case-summary.json`](../evidence/debugger/v0.7-debugging-case-summary.json)
+- [`evidence/hardware/v0.7-macbook-air-probe.txt`](../evidence/hardware/v0.7-macbook-air-probe.txt)
+
+| Field | v0.7 value |
+| --- | --- |
+| Source commit measured | `9382e5f0900d57dd7713baa0e8d554e9af5f91dc` |
+| Executable labs | 21 |
+| Normalized benchmark records | 56 |
+| PostgreSQL version | PostgreSQL 18.4 Homebrew on aarch64-apple-darwin25.4.0 |
+| PostgreSQL source reference | `25b21c0bb712b615f22cf5fcc176764a416368bd` |
+| Physical MCU detected | no |
+
+## PostgreSQL reality observations
+
+| Probe | Observed result | Buffer / timing evidence |
+| --- | --- | --- |
+| Broad `status='done'` aggregate | `Aggregate -> Seq Scan` | 456 shared hit blocks, 1.513 ms execution |
+| Composite ordered lookup | `Limit -> Index Scan` | 10 shared hits, 4 shared reads, 0.035 ms execution |
+| Selective predicate | `Bitmap Index Scan -> Bitmap Heap Scan` | 104 shared hits, 0.148 ms execution |
+| MVCC visibility | second reader saw `pending` before commit and `running` after commit | `visible_only_after_commit: true` |
+| Lock wait | conflicting update failed under `lock_timeout` | `lock_timeout_observed: true` |
+| Deadlock | opposite row lock order aborted one side | `deadlock_detected: true`, `one_transaction_aborted: true` |
+| WAL position | update workload advanced LSN by 37,576 bytes | `pg_wal_lsn_diff(after,before)` |
+
+## Event-loop reality observations
+
+The event-loop lab uses `socketpair` so every strategy sees the same local kernel-socket workload.
+On this MacBook Air run the event backend was `kqueue`. These are host-side measurements, not remote
+network throughput claims.
+
+| Mode | Backend | Clients | Bytes | Read calls | Elapsed | Throughput |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| blocking serial | none | 32 | 4,096 | 70 | 27.250 ms | 150,312 B/s |
+| thread per client | pthread | 32 | 4,096 | 256 | 38.188 ms | 107,258 B/s |
+| event loop | kqueue | 32 | 4,096 | 256 | 103.015 ms | 39,761 B/s |
+
+The important result is not “kqueue is always faster.” In this small socketpair workload, blocking
+serial won the elapsed time because the delayed peer and tiny payload dominate. The stronger claim is
+source-level: the event-loop path handled many descriptors, partial reads and EOF without one thread
+per connection. The first implementation under-counted bytes/hung around EOF and was fixed before
+release evidence.
+
+## Debugging evidence
+
+| Probe | Result |
+| --- | --- |
+| ASan use-after-free fixture | attempted, but this macOS sanitizer runtime aborted before a normal UAF report; not claimed as success |
+| UBSan signed overflow fixture | detected source-line signed integer overflow; exit status 134 |
+| Fixed path | plain binary returns safe JSON with `value=3` and saturating add at `INT_MAX` |
+
+---
+
+# v0.6 cross-layer capstone evidence
+
+v0.6 adds one integrated system, `durable-job-runtime`, instead of expanding the topic list. Raw
+machine-readable evidence is committed as:
+
+- [`evidence/v0.6-macbook-air.json`](../evidence/v0.6-macbook-air.json)
+- [`evidence/v0.6-macbook-air.csv`](../evidence/v0.6-macbook-air.csv)
+
+| Field | v0.6 value |
+| --- | --- |
+| Source commit measured | `ba281ecf44f38d4e0e1572fe71745383603d7607` |
+| Executable labs | 19 |
+| Normalized benchmark records | 56 |
+
+The capstone composes TCP framing, parser, bounded queue, priority scheduler, append-only journal,
+idempotency index and replay recovery. Its deterministic failure campaign reported:
+
+| Failure / invariant | v0.6 result |
+| --- | --- |
+| Duplicate request ID maps to one logical job | true |
+| Dropped half-frame resets parser without command emission | true |
+| Queue full rejects distinct work before acceptance | true |
+| `RUNNING` job is recovered to retry wait after restart | true |
+| Recovered retry can later succeed | true |
+| Corrupt journal tail is ignored before state mutation | true |
+| Truncated journal tail is ignored before state mutation | true |
+| Invalid journal records seen | 2 |
+| Final jobs succeeded after campaign | 2 |
+
+The scenario wrapper is committed as `tools/run_capstone_campaign.py` and its release output is
+stored in `evidence/v0.6-capstone-campaign.json`.
+
+The networking campaign sends firmware-style binary frames over local TCP and intentionally splits
+each frame into partial writes. This measures a local parser/transport path, not remote-network
+scalability.
+
+| Clients | Accepted jobs | Frames | Bytes received | Partial reads | Elapsed | Throughput |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 1 | 1 | 21 | 2 | 5.341 ms | 187.222 jobs/s |
+| 10 | 10 | 10 | 210 | 20 | 52.308 ms | 191.176 jobs/s |
+| 100 | 100 | 100 | 2,190 | 200 | 430.493 ms | 232.292 jobs/s |
+
+| Benchmark | p50 |
+| --- | ---: |
+| Protocol parse loop | 0.157 ms |
+| Failure/recovery campaign | 0.934 ms |
+| 10-client loopback TCP campaign | 52.374 ms |
+
+Two capstone measurements were rejected before this release evidence was committed:
+
+1. The first failure campaign finished a job before restart, so `running_recovered` was false. The
+   campaign now claims a job, discards process state, replays the journal and records recovery.
+2. The first 100-client network campaign used simultaneous client threads and could fail through
+   backlog/connect timing rather than the runtime path. The release campaign uses a deterministic
+   sequence of 1/10/100 loopback clients and still records partial frame reads.
+
+---
+
+# v0.5 firmware-boundary evidence
+
+v0.5 is a simulator-first embedded/firmware track. The MacBook Air hardware probe did not detect a
+Pico, ESP32, Arduino or USB serial adapter, so this benchmark must not be read as physical MCU timing.
+It measures deterministic host-side firmware architecture: bounded buffers, protocol parsing,
+periodic scheduler behavior, state-machine fault handling and simulated MMIO.
+
+Raw evidence:
+
+- [`evidence/v0.5-macbook-air.json`](../evidence/v0.5-macbook-air.json)
+- [`evidence/v0.5-macbook-air.csv`](../evidence/v0.5-macbook-air.csv)
+- [`evidence/hardware/v0.5-macbook-air-probe.txt`](../evidence/hardware/v0.5-macbook-air-probe.txt)
+
+| Field | v0.5 value |
+| --- | --- |
+| Source commit measured | `b2d14c1c12a9ee5f94acf40632092598db1b7fd5` |
+| Executable labs | 18 |
+| Normalized benchmark records | 53 |
+| Physical MCU detected | no |
+
+## v0.5 selected firmware observations
+
+| Track | Observation | Interpretation |
+| --- | --- | --- |
+| Hardware probe | no Pico/ESP32/Arduino/USB-serial keyword detected | simulator-only; no board flashing or GPIO/UART timing claim |
+| State machine | `IDLE -> ARMED -> ACTIVE -> FAULT -> RECOVERY -> IDLE` | capstone includes actuator-active path, injected fault and recovery |
+| Polling vs event | polling mean latency **469.833 us**, max **990 us**; event model fixed at **35 us** | polling latency depends on polling interval; event-like dispatch can lower response latency but needs ISR discipline |
+| Ring buffer | 12 bytes into 8-byte buffer: reject policy rejected **4**, overwrite policy overwrote **4** | overflow behavior is a product/protocol decision, not an implementation detail |
+| Serial protocol | one valid frame, one checksum error, one oversized payload, one timeout reset | parser handles corruption, oversized input and truncated packet timeout |
+| Cooperative scheduler | 100 ms `flash-write` task with 130 ms WCET overran **2** times; sensor task had **127 ms** max jitter and **14** deadline misses | one long cooperative task can damage short periodic tasks |
+| Resource budget | 256-byte static ring, 32-byte max payload, 64 KiB budget, within budget | the lab keeps a declared memory budget instead of allocating without bound |
+| Simulated MMIO | register digest **34**, bit-mask operations used | models flags/register access but does not touch real device registers |
+
+Measured benchmark p50 values for the two timed firmware sections:
+
+| Benchmark | p50 |
+| --- | ---: |
+| `serial-protocol-parse` | 0.204 ms |
+| `cooperative-scheduler-sim` | 0.002 ms |
+
+These numbers are not firmware performance claims. They make the experiment repeatable and expose
+the amount of host-side work done by the parser and simulator.
+
+---
+
 # v0.3 benchmark evidence
 
 The v0.3 snapshot emphasizes failure modes and scaling observations rather than only one-off

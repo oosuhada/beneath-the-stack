@@ -1,0 +1,82 @@
+{
+  "available": true,
+  "claims": {
+    "real_deadlock_detected": true,
+    "real_lock_wait_observed": true,
+    "real_mvcc_visibility_observed": true,
+    "real_postgres_explain_analyze_buffers": true,
+    "wal_lsn_advanced_after_update": true
+  },
+  "database": "bts_reality_61323_1788924740",
+  "deadlock": {
+    "deadlock_detected": true,
+    "left_exit": 0,
+    "one_transaction_aborted": true,
+    "right_exit": 1,
+    "stderr_excerpt": "ERROR:  deadlock detected\nDETAIL:  Process 61381 waits for ShareLock on transaction 73756; blocked by process 61380.\nProcess 61380 waits for ShareLock on transaction 73757; blocked by process 61381.\nHINT:  See server log for query details.\nCONTEXT:  while updating tuple (0,1) in relation \"reality_jobs\"",
+    "stdout_lines": 0
+  },
+  "lock_wait": {
+    "lock_timeout_observed": true,
+    "waiter_exit": 1,
+    "waiter_stderr": "ERROR:  canceling statement due to lock timeout\nCONTEXT:  while updating tuple (0,89) in relation \"reality_jobs\""
+  },
+  "mvcc_visibility": {
+    "reader_after_commit": "running",
+    "reader_before_commit": "pending",
+    "visible_only_after_commit": true,
+    "writer_exit": 0,
+    "writer_stderr": "",
+    "writer_stdout_lines": 0
+  },
+  "plans": {
+    "composite_index_ordered_lookup": {
+      "buffers": {
+        "dirtied": 0,
+        "hit": 10,
+        "read": 4,
+        "written": 0
+      },
+      "execution_time_ms": 0.032,
+      "index_name": null,
+      "node_types": [
+        "Limit",
+        "Index Scan"
+      ]
+    },
+    "high_selectivity_seq_candidate": {
+      "buffers": {
+        "dirtied": 0,
+        "hit": 456,
+        "read": 0,
+        "written": 0
+      },
+      "execution_time_ms": 1.57,
+      "node_types": [
+        "Aggregate",
+        "Seq Scan"
+      ]
+    },
+    "selective_index_lookup": {
+      "buffers": {
+        "dirtied": 0,
+        "hit": 104,
+        "read": 0,
+        "written": 0
+      },
+      "execution_time_ms": 0.141,
+      "node_types": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    }
+  },
+  "postgres_source_commit": "25b21c0bb712b615f22cf5fcc176764a416368bd",
+  "postgres_version": "PostgreSQL 18.4 (Homebrew) on aarch64-apple-darwin25.4.0, compiled by Apple clang version 21.0.0 (clang-2100.0.123.102), 64-bit",
+  "source_commit": "9382e5f0900d57dd7713baa0e8d554e9af5f91dc",
+  "wal": {
+    "after_lsn": "B/5E344D68",
+    "before_lsn": "B/5E33BAA0",
+    "bytes_advanced": 37576
+  }
+}

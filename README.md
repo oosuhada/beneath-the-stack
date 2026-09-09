@@ -32,6 +32,13 @@ real product application
 This is not a coding-test solution archive and it is not a dashboard project. The browser UI is an
 observer. The C++ implementations, POSIX experiments, tests and versioned evidence are the project.
 
+## Portfolio evidence preview
+
+![beneath-the-stack dashboard overview](docs/portfolio/beneath-stack-dashboard.png)
+
+The dashboard is a quick map of the evidence, but the interview value is in the underlying source,
+tests, traces, benchmarks, and defense notes.
+
 ## v0.3 — from examples to investigations
 
 v0.3 is not a topic-expansion sprint. It records the work that is harder to fake: predictions,
@@ -93,6 +100,89 @@ New v0.4 evidence:
 - [`docs/debugger-assembly.md`](docs/debugger-assembly.md) records the LLDB limitation, `sample`
   trace and `-O0`/`-O2` assembly bridge.
 
+## v0.5 — simulator-first firmware boundary
+
+v0.5 moves one layer below OS/device APIs without pretending hardware exists. A safe probe found no
+Pico, ESP32, Arduino or USB serial device on the MacBook Air, so this track uses deterministic
+simulator-first firmware architecture and explicitly makes **no physical MCU measurement claim**.
+
+```text
+OS/device API
+  -> HAL seam
+  -> bounded serial/sensor buffers
+  -> state machine / scheduler / protocol parser
+  -> injected fault
+  -> measured recovery behavior
+```
+
+New v0.5 evidence:
+
+- `include/bts/firmware.hpp` implements a firmware-core model: ring buffer, framed serial protocol,
+  polling-vs-event latency, cooperative scheduler, simulated MMIO and sensor→actuator control logic.
+- `labs/firmware_boundary/main.cpp` injects checksum corruption, oversized payloads, packet timeout,
+  queue overflow, stale/invalid sensor input and a long-running scheduler task.
+- [`docs/notebook/2026-09-09-firmware-boundary.md`](docs/notebook/2026-09-09-firmware-boundary.md)
+  records the actual hardware probe, incorrect first capstone/scheduler fixtures and measurements.
+- [`docs/source-reading/freertos-task-queue.md`](docs/source-reading/freertos-task-queue.md) and
+  [`mcu-hal-gpio-timer-serial.md`](docs/source-reading/mcu-hal-gpio-timer-serial.md) connect the toy
+  firmware model to narrowed FreeRTOS, Pico, ESP-IDF and Arduino source-reading.
+- [`docs/product-bridges/ibridge-device-boundary.md`](docs/product-bridges/ibridge-device-boundary.md)
+  connects the same timing/buffer/protocol/state-machine questions to the iBridge Studio display
+  pipeline without claiming it is MCU firmware.
+
+## v0.6 — cross-layer capstone
+
+v0.6 stops expanding the topic list and connects the existing layers into one small defended system:
+`durable-job-runtime`.
+
+```text
+TCP client
+  -> binary frame / parser
+  -> idempotency index
+  -> bounded priority queue
+  -> worker ownership
+  -> append-only journal
+  -> recovery replay
+  -> queryable state
+```
+
+The defended claims are intentionally specific: duplicate request IDs map to one logical job, a full
+queue rejects new distinct work before writing an accepted record, a `RUNNING` job is retried after
+restart, corrupt/truncated journal tails do not mutate state, and partial TCP reads are assembled
+through a bounded buffer before parsing.
+
+See [`docs/capstone/durable-job-runtime.md`](docs/capstone/durable-job-runtime.md),
+[`docs/defense/`](docs/defense/), [`docs/audit/v0.6-mastery-audit.md`](docs/audit/v0.6-mastery-audit.md)
+and [`EVIDENCE.md`](EVIDENCE.md).
+
+## v0.7 — reality check
+
+v0.7 does not add another toy system. It checks the remaining gap between controlled experiments and
+real runtimes.
+
+```text
+toy storage/index/recovery
+  -> real PostgreSQL planner, buffers, MVCC, locks and WAL position
+
+blocking/threaded sockets
+  -> kqueue event loop on macOS
+
+generated/fixed code
+  -> sanitizer-backed debugging case study
+```
+
+New v0.7 evidence:
+
+- `tools/run_postgres_reality.py` creates a disposable PostgreSQL database and records real
+  `EXPLAIN (ANALYZE, BUFFERS)`, MVCC visibility, lock timeout, deadlock and WAL LSN observations.
+- `labs/event_loop_reality/main.cpp` compares blocking serial reads, thread-per-client reads and a
+  macOS `kqueue` event loop on one socketpair workload. Linux CI builds the same lab through a poll
+  fallback, but does not claim kqueue timing.
+- `tools/run_debugging_case.sh` attempts ASan use-after-free evidence and captures UBSan signed
+  overflow evidence with source-line output.
+- [`docs/reality/v0.7-real-systems-validation.md`](docs/reality/v0.7-real-systems-validation.md)
+  records what was validated and what is still not claimed.
+
 ## v0.2 — from labs to an evidence graph
 
 v0.1 established six executable experiments. v0.2 keeps those and adds the missing bridges between
@@ -130,6 +220,8 @@ include/bts/
 ├── allocator.hpp        bump allocator · free list · split · coalescing · fragmentation stats
 ├── scheduler.hpp        FIFO · round-robin · priority · SJF toy scheduler metrics
 ├── toy_filesystem.hpp   directory entries · inode-like metadata · fixed-size blocks
+├── firmware.hpp         ring buffer · protocol parser · cooperative scheduler · simulated MMIO
+├── durable_job_runtime.hpp TCP-framed job runtime · idempotency · journal replay
 ├── embedded.hpp         HAL boundary · simulated output · thermal state machine
 └── benchmark.hpp        warm-up · repeated samples · p50/p95 · mean/stddev
 ```
@@ -138,7 +230,7 @@ No third-party C++ data-structure or benchmark framework is required for these l
 
 ## Executable laboratories
 
-Seventeen binaries emit machine-readable JSON. `tools/run_labs.py` only orchestrates them; it does not
+Twenty-one binaries emit machine-readable JSON. `tools/run_labs.py` only orchestrates them; it does not
 manufacture algorithm results.
 
 ```text
@@ -158,7 +250,11 @@ scheduler-internals FIFO/RR/priority/SJF run-queue trade-offs
 storage-engine      row serialization → pages → file → B+tree locations
 allocator           metadata · alignment · fragmentation · coalescing failures
 toy-filesystem      path → directory entry → inode-like metadata → fixed-size blocks
+firmware-boundary   HAL · ring buffer · serial protocol · scheduler jitter · simulated MMIO
 embedded-simulator  simulated sensor event → state machine → digital output
+durable-job-runtime TCP frame → parser → bounded queue → journal → recovery
+event-loop-reality blocking vs threaded vs kqueue/poll socket reads
+debugging-case      disabled fault fixtures + safe fixed path
 ```
 
 ## Evidence, not a leaderboard
