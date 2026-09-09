@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <chrono>
+#include <csignal>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -367,6 +368,9 @@ void print_network(const NetworkCampaignResult& result) {
 }  // namespace
 
 int main(int argc, char** argv) {
+#ifndef _WIN32
+  std::signal(SIGPIPE, SIG_IGN);
+#endif
   const int warmup = int_option(argc, argv, "--warmup", 0);
   const int repetitions = int_option(argc, argv, "--repetitions", 1);
   const int clients = int_option(argc, argv, "--clients", 10);
