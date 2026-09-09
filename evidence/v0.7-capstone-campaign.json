@@ -1,0 +1,78 @@
+{
+  "command": "build/bin/durable_job_runtime_lab --clients 10 --max-clients 100 --warmup 0 --repetitions 1",
+  "lab": "durable-job-runtime",
+  "scenarios": [
+    {
+      "evidence": {
+        "accepted": 10,
+        "bytes_received": 210,
+        "clients": 10,
+        "elapsed_ms": 43.661,
+        "frames": 10,
+        "partial_reads": 20,
+        "throughput_jobs_per_sec": 229.038
+      },
+      "name": "normal",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "partial_reads": 20
+      },
+      "name": "partial-packet",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "network_drop_reset": true
+      },
+      "name": "network-drop",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "duplicate_idempotent": true
+      },
+      "name": "duplicate",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "running_recovered": true
+      },
+      "name": "worker-crash",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "corrupt_tail_ignored": true,
+        "invalid_records_seen": 2,
+        "truncated_tail_ignored": true
+      },
+      "name": "storage-corruption",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "queue_full_rejected": true
+      },
+      "name": "queue-full",
+      "passed": true
+    },
+    {
+      "evidence": {
+        "accepted": 100,
+        "bytes_received": 2190,
+        "clients": 100,
+        "elapsed_ms": 442.703,
+        "frames": 100,
+        "partial_reads": 200,
+        "throughput_jobs_per_sec": 225.885
+      },
+      "name": "slow-consumer-pressure",
+      "passed": true
+    }
+  ],
+  "schema_version": 1,
+  "source_commit": "f14385e06512312e4641153a1dd1ae7c7b2c47a9"
+}

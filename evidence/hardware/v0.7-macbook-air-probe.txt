@@ -1,0 +1,19 @@
+# v0.7 MacBook Air hardware probe
+
+captured_at_utc=2026-09-09T03:27:40Z
+source_commit=f14385e06512312e4641153a1dd1ae7c7b2c47a9
+
+## MCU / USB-serial candidate devices
+none
+
+## All visible cu/tty devices
+- /dev/cu.Bluetooth-Incoming-Port
+- /dev/cu.BoseQCUltraHeadphones
+- /dev/cu.OosusBoseQC35II
+- /dev/cu.debug-console
+- /dev/tty.Bluetooth-Incoming-Port
+- /dev/tty.BoseQCUltraHeadphones
+- /dev/tty.OosusBoseQC35II
+- /dev/tty.debug-console
+
+Conclusion: no physical MCU board or USB serial adapter is claimed in v0.7.

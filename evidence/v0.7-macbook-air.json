@@ -1,0 +1,2340 @@
+{
+  "captured_at_utc": "2026-09-09T03:27:33.930399+00:00",
+  "environment": {
+    "compiler": "Apple clang version 16.0.0 (clang-1600.0.26.3)",
+    "cxxflags": "-std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -pthread",
+    "machine": "arm64",
+    "memory_bytes": "25769803776",
+    "model": "Mac15,13",
+    "python": "3.14.6",
+    "release": "27.0.0",
+    "system": "Darwin"
+  },
+  "git_commit": "f14385e06512312e4641153a1dd1ae7c7b2c47a9",
+  "labs": [
+    {
+      "chaining": {
+        "bucket_count": 32768,
+        "bucket_histogram": [
+          17827,
+          10808,
+          3330,
+          691,
+          102,
+          9,
+          1
+        ],
+        "insert": {
+          "max_ms": 2.993625,
+          "mean_ms": 2.923764,
+          "min_ms": 2.785833,
+          "name": "chaining-insert",
+          "p50_ms": 2.928417,
+          "p95_ms": 2.990708,
+          "repetitions": 15,
+          "stddev_ms": 0.063229,
+          "warmup": 3
+        },
+        "load_factor": 0.610352,
+        "lookup": {
+          "max_ms": 0.587458,
+          "mean_ms": 0.570883,
+          "min_ms": 0.566584,
+          "name": "chaining-lookup",
+          "p50_ms": 0.568875,
+          "p95_ms": 0.577629,
+          "repetitions": 15,
+          "stddev_ms": 0.004855,
+          "warmup": 3
+        },
+        "max_chain": 6
+      },
+      "items": 20000,
+      "lab": "hash-table",
+      "open_addressing": {
+        "capacity": 32768,
+        "insert": {
+          "max_ms": 2.457959,
+          "mean_ms": 2.440819,
+          "min_ms": 2.434583,
+          "name": "linear-probe-insert",
+          "p50_ms": 2.439958,
+          "p95_ms": 2.45195,
+          "repetitions": 15,
+          "stddev_ms": 0.00571,
+          "warmup": 3
+        },
+        "load_factor": 0.610352,
+        "longest_cluster": 56,
+        "lookup": {
+          "max_ms": 0.722541,
+          "mean_ms": 0.674964,
+          "min_ms": 0.62725,
+          "name": "linear-probe-lookup",
+          "p50_ms": 0.675625,
+          "p95_ms": 0.71837,
+          "repetitions": 15,
+          "stddev_ms": 0.028406,
+          "warmup": 3
+        }
+      }
+    },
+    {
+      "heap": {
+        "max_ms": 0.132125,
+        "mean_ms": 0.126283,
+        "min_ms": 0.124291,
+        "name": "binary-heap-schedule",
+        "p50_ms": 0.125041,
+        "p95_ms": 0.1304,
+        "repetitions": 10,
+        "stddev_ms": 0.002328,
+        "warmup": 2
+      },
+      "lab": "heap-scheduler",
+      "linear_min": {
+        "max_ms": 5.5155,
+        "mean_ms": 5.496313,
+        "min_ms": 5.466333,
+        "name": "linear-min-schedule",
+        "p50_ms": 5.494917,
+        "p95_ms": 5.514844,
+        "repetitions": 10,
+        "stddev_ms": 0.013729,
+        "warmup": 2
+      },
+      "scheduler_trace": [
+        {
+          "arrival": 0,
+          "deadline": 4,
+          "duration": 1,
+          "id": 1
+        },
+        {
+          "arrival": 0,
+          "deadline": 7,
+          "duration": 2,
+          "id": 0
+        },
+        {
+          "arrival": 2,
+          "deadline": 5,
+          "duration": 1,
+          "id": 3
+        },
+        {
+          "arrival": 4,
+          "deadline": 8,
+          "duration": 1,
+          "id": 5
+        },
+        {
+          "arrival": 1,
+          "deadline": 9,
+          "duration": 2,
+          "id": 2
+        },
+        {
+          "arrival": 6,
+          "deadline": 11,
+          "duration": 1,
+          "id": 7
+        },
+        {
+          "arrival": 5,
+          "deadline": 12,
+          "duration": 2,
+          "id": 6
+        },
+        {
+          "arrival": 9,
+          "deadline": 13,
+          "duration": 1,
+          "id": 9
+        },
+        {
+          "arrival": 3,
+          "deadline": 14,
+          "duration": 3,
+          "id": 4
+        },
+        {
+          "arrival": 11,
+          "deadline": 16,
+          "duration": 1,
+          "id": 11
+        },
+        {
+          "arrival": 8,
+          "deadline": 18,
+          "duration": 2,
+          "id": 8
+        },
+        {
+          "arrival": 10,
+          "deadline": 20,
+          "duration": 2,
+          "id": 10
+        }
+      ],
+      "tasks": 2500
+    },
+    {
+      "benchmark_grid": {
+        "height": 120,
+        "width": 120
+      },
+      "bfs": {
+        "max_ms": 0.089083,
+        "mean_ms": 0.083577,
+        "min_ms": 0.080875,
+        "name": "bfs-grid",
+        "p50_ms": 0.082354,
+        "p95_ms": 0.087539,
+        "repetitions": 20,
+        "stddev_ms": 0.002517,
+        "warmup": 3
+      },
+      "demo": {
+        "bfs_order": [
+          0,
+          1,
+          12,
+          2,
+          13,
+          24,
+          3,
+          14,
+          25,
+          36,
+          4,
+          15,
+          26,
+          37,
+          48,
+          5,
+          27,
+          38,
+          49,
+          60,
+          6,
+          28,
+          39,
+          50,
+          61,
+          72,
+          7,
+          18,
+          29,
+          40,
+          51,
+          62,
+          73,
+          84,
+          8,
+          30,
+          41,
+          52,
+          63,
+          85,
+          96,
+          9,
+          20,
+          31,
+          42,
+          53,
+          64,
+          86,
+          97,
+          10,
+          21,
+          32,
+          43,
+          65,
+          87,
+          11,
+          22,
+          33,
+          44,
+          55,
+          66,
+          77,
+          88,
+          99,
+          23,
+          34,
+          45,
+          56,
+          78,
+          89,
+          100,
+          111,
+          35,
+          57,
+          68,
+          90,
+          101,
+          112,
+          110,
+          47,
+          69,
+          91,
+          102,
+          113,
+          59,
+          70,
+          81,
+          103,
+          71,
+          82,
+          93,
+          115,
+          83,
+          94,
+          105,
+          116,
+          95,
+          106,
+          117,
+          107,
+          118,
+          119
+        ],
+        "bfs_path": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          23,
+          35,
+          47,
+          59,
+          71,
+          83,
+          95,
+          107,
+          119
+        ],
+        "blocked": [
+          16,
+          17,
+          19,
+          46,
+          54,
+          58,
+          67,
+          74,
+          75,
+          76,
+          79,
+          80,
+          92,
+          98,
+          104,
+          108,
+          109,
+          114
+        ],
+        "dfs_order": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          23,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          36,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          65,
+          66,
+          78,
+          90,
+          89,
+          88,
+          87,
+          86,
+          85,
+          73,
+          72,
+          84,
+          96,
+          97,
+          99,
+          111,
+          110,
+          112,
+          113,
+          100,
+          101,
+          91,
+          103,
+          115,
+          116,
+          117,
+          105,
+          93,
+          81,
+          69,
+          57,
+          56,
+          55,
+          68,
+          70,
+          71,
+          59,
+          83,
+          95,
+          107,
+          119,
+          82,
+          94,
+          106,
+          118,
+          102,
+          77,
+          64,
+          63,
+          62,
+          61,
+          60,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          47,
+          22,
+          21,
+          20,
+          18,
+          15,
+          14,
+          13,
+          12
+        ],
+        "dfs_path": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          23,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          36,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          65,
+          66,
+          78,
+          90,
+          91,
+          103,
+          115,
+          116,
+          117,
+          105,
+          93,
+          81,
+          69,
+          70,
+          71,
+          83,
+          95,
+          107,
+          119
+        ],
+        "height": 10,
+        "width": 12
+      },
+      "dfs": {
+        "max_ms": 0.086625,
+        "mean_ms": 0.07849,
+        "min_ms": 0.075709,
+        "name": "dfs-grid",
+        "p50_ms": 0.077563,
+        "p95_ms": 0.083458,
+        "repetitions": 20,
+        "stddev_ms": 0.002527,
+        "warmup": 3
+      },
+      "frontier_memory": {
+        "bfs_peak_nodes": 9,
+        "dfs_peak_nodes": 32
+      },
+      "lab": "graph-traversal"
+    },
+    {
+      "atomic": {
+        "benchmark": {
+          "max_ms": 14.801458,
+          "mean_ms": 14.116521,
+          "min_ms": 13.624083,
+          "name": "atomic-fetch-add",
+          "p50_ms": 13.962875,
+          "p95_ms": 14.720573,
+          "repetitions": 6,
+          "stddev_ms": 0.398012,
+          "warmup": 1
+        },
+        "observed": 800000
+      },
+      "expected": 800000,
+      "increments_per_thread": 100000,
+      "lab": "concurrency-race",
+      "mutex": {
+        "benchmark": {
+          "max_ms": 15.684083,
+          "mean_ms": 15.317722,
+          "min_ms": 15.080375,
+          "name": "mutex",
+          "p50_ms": 15.291125,
+          "p95_ms": 15.625187,
+          "repetitions": 6,
+          "stddev_ms": 0.205723,
+          "warmup": 1
+        },
+        "observed": 800000
+      },
+      "note": "split load/store uses atomic individual accesses to demonstrate a lost-update race without invoking a C++ data-race UB",
+      "split_load_store": {
+        "benchmark": {
+          "max_ms": 0.730083,
+          "mean_ms": 0.693653,
+          "min_ms": 0.64625,
+          "name": "split-load-store",
+          "p50_ms": 0.700125,
+          "p95_ms": 0.724614,
+          "repetitions": 6,
+          "stddev_ms": 0.026396,
+          "warmup": 1
+        },
+        "observed": 117100
+      },
+      "threads": 8
+    },
+    {
+      "concurrent_clients": 4,
+      "concurrent_keep_alive": {
+        "max_ms": 0.493292,
+        "mean_ms": 0.470896,
+        "min_ms": 0.457958,
+        "name": "concurrent-keep-alive",
+        "p50_ms": 0.467812,
+        "p95_ms": 0.49004,
+        "repetitions": 8,
+        "stddev_ms": 0.011068,
+        "warmup": 2
+      },
+      "connection_pool": {
+        "max_ms": 1.434875,
+        "mean_ms": 1.370755,
+        "min_ms": 1.334709,
+        "name": "connection-pool-reuse",
+        "p50_ms": 1.368854,
+        "p95_ms": 1.423704,
+        "repetitions": 8,
+        "stddev_ms": 0.033531,
+        "warmup": 2
+      },
+      "keep_alive": {
+        "max_ms": 1.221375,
+        "mean_ms": 1.194365,
+        "min_ms": 1.18225,
+        "name": "http-keep-alive",
+        "p50_ms": 1.189792,
+        "p95_ms": 1.215717,
+        "repetitions": 8,
+        "stddev_ms": 0.011935,
+        "warmup": 2
+      },
+      "lab": "raw-http",
+      "new_connection": {
+        "max_ms": 5.941417,
+        "mean_ms": 4.482485,
+        "min_ms": 4.194834,
+        "name": "new-tcp-connection-per-request",
+        "p50_ms": 4.234771,
+        "p95_ms": 5.45881,
+        "repetitions": 8,
+        "stddev_ms": 0.562913,
+        "warmup": 2
+      },
+      "parser": "request-line + normalized headers",
+      "pool_size": 4,
+      "requests_per_run": 80,
+      "requests_served": 3241,
+      "serial_blocking_slow": {
+        "max_ms": 412.052875,
+        "mean_ms": 339.393651,
+        "min_ms": 302.134375,
+        "name": "serial-blocking-slow-requests",
+        "p50_ms": 338.296187,
+        "p95_ms": 388.928506,
+        "repetitions": 8,
+        "stddev_ms": 31.949683,
+        "warmup": 2
+      },
+      "server_port": 49930,
+      "thread_per_client_slow": {
+        "max_ms": 106.971959,
+        "mean_ms": 102.183646,
+        "min_ms": 95.394708,
+        "name": "thread-per-client-slow-requests",
+        "p50_ms": 102.347916,
+        "p95_ms": 106.687277,
+        "repetitions": 8,
+        "stddev_ms": 3.960158,
+        "warmup": 2
+      },
+      "timeout_observed": true,
+      "transport": "POSIX TCP loopback + hand-written HTTP/1.1 framing",
+      "transport_counters": {
+        "serial": {
+          "accepted_connections": 40,
+          "bytes_received": 2320,
+          "bytes_sent": 3440
+        },
+        "threaded": {
+          "accepted_connections": 931,
+          "bytes_received": 206128,
+          "bytes_sent": 290476
+        }
+      }
+    },
+    {
+      "bplus_tree": {
+        "max_ms": 0.038042,
+        "mean_ms": 0.028529,
+        "min_ms": 0.025583,
+        "name": "bplus-tree-lookup",
+        "p50_ms": 0.026521,
+        "p95_ms": 0.036298,
+        "repetitions": 10,
+        "stddev_ms": 0.004063,
+        "warmup": 2
+      },
+      "index_build": {
+        "max_ms": 2.539041,
+        "mean_ms": 1.944571,
+        "min_ms": 1.669,
+        "name": "bplus-tree-build",
+        "p50_ms": 1.928916,
+        "p95_ms": 2.433029,
+        "repetitions": 10,
+        "stddev_ms": 0.282866,
+        "warmup": 2
+      },
+      "lab": "db-index",
+      "leaf_count": 556,
+      "order": 32,
+      "queries": 600,
+      "range_scan": {
+        "from": 4000,
+        "returned": 25,
+        "to": 4024
+      },
+      "rows": 12000,
+      "sequential_scan": {
+        "max_ms": 1.641917,
+        "mean_ms": 1.541583,
+        "min_ms": 1.454667,
+        "name": "sequential-scan",
+        "p50_ms": 1.537791,
+        "p95_ms": 1.634792,
+        "repetitions": 10,
+        "stddev_ms": 0.084798,
+        "warmup": 2
+      },
+      "tree_height": 3
+    },
+    {
+      "bst": {
+        "lookup": {
+          "max_ms": 0.129541,
+          "mean_ms": 0.081328,
+          "min_ms": 0.063166,
+          "name": "bst-random-lookup",
+          "p50_ms": 0.0695,
+          "p95_ms": 0.122293,
+          "repetitions": 8,
+          "stddev_ms": 0.023103,
+          "warmup": 2
+        },
+        "random_height": 35,
+        "sorted_height": 1500,
+        "sorted_input_items": 1500
+      },
+      "dynamic_array": {
+        "append": {
+          "max_ms": 0.012042,
+          "mean_ms": 0.009125,
+          "min_ms": 0.008166,
+          "name": "dynamic-array-append",
+          "p50_ms": 0.008417,
+          "p95_ms": 0.011459,
+          "repetitions": 8,
+          "stddev_ms": 0.001302,
+          "warmup": 2
+        },
+        "capacity": 16384,
+        "capacity_changes": 12
+      },
+      "items": 12000,
+      "lab": "data-structures",
+      "linked_list": {
+        "append": {
+          "max_ms": 0.279583,
+          "mean_ms": 0.202047,
+          "min_ms": 0.186833,
+          "name": "linked-list-append",
+          "p50_ms": 0.187042,
+          "p95_ms": 0.256206,
+          "repetitions": 8,
+          "stddev_ms": 0.030477,
+          "warmup": 2
+        }
+      },
+      "trie": {
+        "lookup": {
+          "max_ms": 0.018833,
+          "mean_ms": 0.018729,
+          "min_ms": 0.018625,
+          "name": "trie-prefix-lookup",
+          "p50_ms": 0.018729,
+          "p95_ms": 0.018819,
+          "repetitions": 8,
+          "stddev_ms": 6.2e-05,
+          "warmup": 2
+        },
+        "words": 12000
+      },
+      "union_find": {
+        "benchmark": {
+          "max_ms": 0.058,
+          "mean_ms": 0.057802,
+          "min_ms": 0.057708,
+          "name": "union-find-chain-connect",
+          "p50_ms": 0.057771,
+          "p95_ms": 0.057985,
+          "repetitions": 8,
+          "stddev_ms": 0.000108,
+          "warmup": 2
+        }
+      }
+    },
+    {
+      "binary_search": {
+        "binary": {
+          "max_ms": 0.03875,
+          "mean_ms": 0.038076,
+          "min_ms": 0.037375,
+          "name": "binary-search-sorted-array",
+          "p50_ms": 0.03825,
+          "p95_ms": 0.038656,
+          "repetitions": 6,
+          "stddev_ms": 0.000499,
+          "warmup": 1
+        },
+        "linear": {
+          "max_ms": 140.054958,
+          "mean_ms": 138.199354,
+          "min_ms": 135.851458,
+          "name": "linear-search-sorted-array",
+          "p50_ms": 138.599604,
+          "p95_ms": 139.812812,
+          "repetitions": 6,
+          "stddev_ms": 1.405054,
+          "warmup": 1
+        },
+        "queries": 1000,
+        "seed": 72895878732377,
+        "sorted_items": 1000000
+      },
+      "dynamic_programming": {
+        "memoized_calls": 63,
+        "n": 32,
+        "naive_calls": 7049155,
+        "value": 2178309
+      },
+      "lab": "algorithm-defense",
+      "topological_sort": {
+        "cycle_detected_in_cycle_fixture": true,
+        "cycle_detected_in_dag": false,
+        "dag_order_size": 6
+      },
+      "weighted_shortest_path": {
+        "bad_candidate": "BFS by hop count",
+        "bfs_hop_path": [
+          0,
+          1,
+          3
+        ],
+        "bfs_weighted_cost": 101,
+        "dijkstra_cost": 3
+      }
+    },
+    {
+      "contiguous": {
+        "max_ms": 0.049417,
+        "mean_ms": 0.049358,
+        "min_ms": 0.049292,
+        "name": "contiguous-array-traversal",
+        "p50_ms": 0.049355,
+        "p95_ms": 0.049417,
+        "repetitions": 10,
+        "stddev_ms": 3.8e-05,
+        "warmup": 2
+      },
+      "heap_block": {
+        "max_ms": 0.001583,
+        "mean_ms": 0.001512,
+        "min_ms": 0.0015,
+        "name": "heap-block-touch-4096-int",
+        "p50_ms": 0.0015,
+        "p95_ms": 0.001565,
+        "repetitions": 10,
+        "stddev_ms": 2.7e-05,
+        "warmup": 2
+      },
+      "items": 200000,
+      "lab": "memory-locality",
+      "linked": {
+        "max_ms": 0.11125,
+        "mean_ms": 0.084133,
+        "min_ms": 0.06875,
+        "name": "linked-list-pointer-chase",
+        "p50_ms": 0.080604,
+        "p95_ms": 0.109,
+        "repetitions": 10,
+        "stddev_ms": 0.013447,
+        "warmup": 2
+      },
+      "note": "same values; layout differs between contiguous storage and separately allocated nodes",
+      "stack_frame": {
+        "max_ms": 0.001542,
+        "mean_ms": 0.001533,
+        "min_ms": 0.0015,
+        "name": "stack-frame-touch-4096-int",
+        "p50_ms": 0.001541,
+        "p95_ms": 0.001542,
+        "repetitions": 10,
+        "stddev_ms": 1.7e-05,
+        "warmup": 2
+      }
+    },
+    {
+      "cached_pid": {
+        "max_ms": 0.248125,
+        "mean_ms": 0.246813,
+        "min_ms": 0.246542,
+        "name": "cached-pid-load",
+        "p50_ms": 0.246625,
+        "p95_ms": 0.24785,
+        "repetitions": 12,
+        "stddev_ms": 0.000487,
+        "warmup": 1
+      },
+      "calls_per_sample": 1000000,
+      "dup_shared_offset": {
+        "first_read": "ab",
+        "second_read": "cd"
+      },
+      "exec_inherited_stdout": {
+        "exit_code": 0,
+        "output": "before-exec\nafter-exec\n"
+      },
+      "fork_wait": {
+        "max_ms": 0.542417,
+        "mean_ms": 0.392792,
+        "min_ms": 0.318708,
+        "name": "fork-and-wait",
+        "p50_ms": 0.383563,
+        "p95_ms": 0.524725,
+        "repetitions": 12,
+        "stddev_ms": 0.065767,
+        "warmup": 1
+      },
+      "getpid": {
+        "max_ms": 1.007584,
+        "mean_ms": 0.988535,
+        "min_ms": 0.986208,
+        "name": "getpid-call",
+        "p50_ms": 0.98625,
+        "p95_ms": 0.9975,
+        "repetitions": 12,
+        "stddev_ms": 0.005822,
+        "warmup": 1
+      },
+      "lab": "process-fd",
+      "pipe_capacity_observed_bytes": 65536,
+      "platform": "POSIX",
+      "process_isolation": {
+        "child_local": 99,
+        "child_parent_pid": 59460,
+        "child_pid": 59461,
+        "parent_local_after": 7,
+        "parent_pid": 59460
+      },
+      "three_stage_pipeline": {
+        "command_shape": "cat file | grep apple | wc -l",
+        "exit_codes": [
+          0,
+          0,
+          0
+        ],
+        "output": "       3\n"
+      },
+      "zombie_before_wait": {
+        "exit_code": 23,
+        "state": "Z"
+      }
+    },
+    {
+      "context_switch": {
+        "no_switch": {
+          "max_ms": 0.001167,
+          "mean_ms": 0.000861,
+          "min_ms": 0.000291,
+          "name": "no-switch-loop",
+          "p50_ms": 0.001125,
+          "p95_ms": 0.001167,
+          "repetitions": 6,
+          "stddev_ms": 0.000403,
+          "warmup": 1
+        },
+        "process_ping_pong": {
+          "max_ms": 4.330917,
+          "mean_ms": 4.108153,
+          "min_ms": 3.983834,
+          "name": "process-pipe-ping-pong",
+          "p50_ms": 4.082583,
+          "p95_ms": 4.288032,
+          "repetitions": 6,
+          "stddev_ms": 0.114634,
+          "warmup": 1
+        },
+        "thread_ping_pong": {
+          "max_ms": 2.505125,
+          "mean_ms": 2.297194,
+          "min_ms": 2.206333,
+          "name": "thread-condition-variable-ping-pong",
+          "p50_ms": 2.259688,
+          "p95_ms": 2.463364,
+          "repetitions": 6,
+          "stddev_ms": 0.104777,
+          "warmup": 1
+        }
+      },
+      "copy_on_write": {
+        "child_first_byte_after_write": 2,
+        "child_rss_after_write": 17956864,
+        "child_rss_before_write": 1163264,
+        "pages_written": 1024,
+        "parent_first_byte_after_child": 1,
+        "parent_rss_after_child_write": 18382848,
+        "parent_rss_before_fork": 18382848
+      },
+      "durability": {
+        "claim": "write success is not the same as a completed fsync durability boundary",
+        "write_close": {
+          "max_ms": 0.1415,
+          "mean_ms": 0.109153,
+          "min_ms": 0.09075,
+          "name": "write-close-without-fsync",
+          "p50_ms": 0.106771,
+          "p95_ms": 0.134573,
+          "repetitions": 6,
+          "stddev_ms": 0.016378,
+          "warmup": 1
+        },
+        "write_fsync": {
+          "max_ms": 0.148292,
+          "mean_ms": 0.136604,
+          "min_ms": 0.12325,
+          "name": "write-fsync-close",
+          "p50_ms": 0.13702,
+          "p95_ms": 0.148292,
+          "repetitions": 6,
+          "stddev_ms": 0.011308,
+          "warmup": 1
+        }
+      },
+      "fd_identity": {
+        "descriptor_number": 3,
+        "independent_child_read": "ab",
+        "independent_parent_read": "ab",
+        "inherited_child_read": "cd",
+        "inherited_parent_read": "ab"
+      },
+      "io_bytes": 1048576,
+      "lab": "os-boundary",
+      "platform": "POSIX user-space observations, xv6 source-reading bridge",
+      "read_vs_mmap": {
+        "checksums_match": true,
+        "mmap": {
+          "max_ms": 0.301542,
+          "mean_ms": 0.300222,
+          "min_ms": 0.299333,
+          "name": "mmap-sequential-file",
+          "p50_ms": 0.300042,
+          "p95_ms": 0.301313,
+          "repetitions": 6,
+          "stddev_ms": 0.000707,
+          "warmup": 1
+        },
+        "read_loop": {
+          "max_ms": 0.176959,
+          "mean_ms": 0.168063,
+          "min_ms": 0.163917,
+          "name": "read-loop-sequential-file",
+          "p50_ms": 0.165666,
+          "p95_ms": 0.175604,
+          "repetitions": 6,
+          "stddev_ms": 0.004686,
+          "warmup": 1
+        }
+      },
+      "switch_rounds": 1000,
+      "syscall_boundary": {
+        "direct_syscall_used": false,
+        "limitation": "macOS marks syscall(2) deprecated; use the supported libc wrapper for this portable lab",
+        "write_observed": true
+      }
+    },
+    {
+      "intentional_guard_page_failure_signal": 10,
+      "lab": "virtual-memory",
+      "map_and_touch": {
+        "max_ms": 2.979084,
+        "mean_ms": 2.900577,
+        "min_ms": 2.825125,
+        "name": "mmap-and-touch-every-page",
+        "p50_ms": 2.898813,
+        "p95_ms": 2.965146,
+        "repetitions": 6,
+        "stddev_ms": 0.046759,
+        "warmup": 1
+      },
+      "map_only": {
+        "max_ms": 0.000625,
+        "mean_ms": 0.000438,
+        "min_ms": 0.000375,
+        "name": "mmap-without-page-touch",
+        "p50_ms": 0.000417,
+        "p95_ms": 0.000573,
+        "repetitions": 6,
+        "stddev_ms": 8.6e-05,
+        "warmup": 1
+      },
+      "mapped_file_persisted": true,
+      "mapping_bytes": 67108864,
+      "page_count": 4096,
+      "page_size_bytes": 16384,
+      "resident_bytes": {
+        "after_map_without_touch": 1572864,
+        "after_touch_every_page": 68681728,
+        "before": 1572864
+      }
+    },
+    {
+      "benchmark": {
+        "max_ms": 0.002292,
+        "mean_ms": 0.001516,
+        "min_ms": 0.001083,
+        "name": "scheduler-policy-simulation",
+        "p50_ms": 0.0015,
+        "p95_ms": 0.00216,
+        "repetitions": 8,
+        "stddev_ms": 0.000419,
+        "warmup": 1
+      },
+      "job_count": 15,
+      "lab": "scheduler-internals",
+      "model": "deterministic toy run queue, not the macOS scheduler",
+      "round_robin_quantum": 5,
+      "summaries": {
+        "fifo": {
+          "jobs": [
+            {
+              "arrival": 0,
+              "completion": 40,
+              "first_run": 0,
+              "id": 0,
+              "priority": 5,
+              "service": 40,
+              "turnaround": 40,
+              "waiting": 0
+            },
+            {
+              "arrival": 1,
+              "completion": 61,
+              "first_run": 59,
+              "id": 1,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 60,
+              "waiting": 58
+            },
+            {
+              "arrival": 2,
+              "completion": 63,
+              "first_run": 61,
+              "id": 2,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 61,
+              "waiting": 59
+            },
+            {
+              "arrival": 3,
+              "completion": 65,
+              "first_run": 63,
+              "id": 3,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 62,
+              "waiting": 60
+            },
+            {
+              "arrival": 4,
+              "completion": 67,
+              "first_run": 65,
+              "id": 4,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 63,
+              "waiting": 61
+            },
+            {
+              "arrival": 5,
+              "completion": 69,
+              "first_run": 67,
+              "id": 5,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 64,
+              "waiting": 62
+            },
+            {
+              "arrival": 6,
+              "completion": 71,
+              "first_run": 69,
+              "id": 6,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 65,
+              "waiting": 63
+            },
+            {
+              "arrival": 7,
+              "completion": 73,
+              "first_run": 71,
+              "id": 7,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 66,
+              "waiting": 64
+            },
+            {
+              "arrival": 8,
+              "completion": 75,
+              "first_run": 73,
+              "id": 8,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 67,
+              "waiting": 65
+            },
+            {
+              "arrival": 9,
+              "completion": 77,
+              "first_run": 75,
+              "id": 9,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 68,
+              "waiting": 66
+            },
+            {
+              "arrival": 10,
+              "completion": 79,
+              "first_run": 77,
+              "id": 10,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 69,
+              "waiting": 67
+            },
+            {
+              "arrival": 11,
+              "completion": 81,
+              "first_run": 79,
+              "id": 11,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 70,
+              "waiting": 68
+            },
+            {
+              "arrival": 12,
+              "completion": 83,
+              "first_run": 81,
+              "id": 12,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 71,
+              "waiting": 69
+            },
+            {
+              "arrival": 0,
+              "completion": 58,
+              "first_run": 40,
+              "id": 13,
+              "priority": 0,
+              "service": 18,
+              "turnaround": 58,
+              "waiting": 40
+            },
+            {
+              "arrival": 0,
+              "completion": 59,
+              "first_run": 58,
+              "id": 14,
+              "priority": 0,
+              "service": 1,
+              "turnaround": 59,
+              "waiting": 58
+            }
+          ],
+          "max_waiting": 69,
+          "mean_turnaround": 62.8667,
+          "mean_waiting": 57.3333,
+          "p95_waiting": 69,
+          "policy": "fifo",
+          "starvation_count": 13,
+          "starvation_threshold": 50,
+          "total_time": 83
+        },
+        "priority": {
+          "jobs": [
+            {
+              "arrival": 0,
+              "completion": 83,
+              "first_run": 43,
+              "id": 0,
+              "priority": 5,
+              "service": 40,
+              "turnaround": 83,
+              "waiting": 43
+            },
+            {
+              "arrival": 1,
+              "completion": 21,
+              "first_run": 19,
+              "id": 1,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 20,
+              "waiting": 18
+            },
+            {
+              "arrival": 2,
+              "completion": 23,
+              "first_run": 21,
+              "id": 2,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 21,
+              "waiting": 19
+            },
+            {
+              "arrival": 3,
+              "completion": 25,
+              "first_run": 23,
+              "id": 3,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 22,
+              "waiting": 20
+            },
+            {
+              "arrival": 4,
+              "completion": 27,
+              "first_run": 25,
+              "id": 4,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 23,
+              "waiting": 21
+            },
+            {
+              "arrival": 5,
+              "completion": 29,
+              "first_run": 27,
+              "id": 5,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 24,
+              "waiting": 22
+            },
+            {
+              "arrival": 6,
+              "completion": 31,
+              "first_run": 29,
+              "id": 6,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 25,
+              "waiting": 23
+            },
+            {
+              "arrival": 7,
+              "completion": 33,
+              "first_run": 31,
+              "id": 7,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 26,
+              "waiting": 24
+            },
+            {
+              "arrival": 8,
+              "completion": 35,
+              "first_run": 33,
+              "id": 8,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 27,
+              "waiting": 25
+            },
+            {
+              "arrival": 9,
+              "completion": 37,
+              "first_run": 35,
+              "id": 9,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 28,
+              "waiting": 26
+            },
+            {
+              "arrival": 10,
+              "completion": 39,
+              "first_run": 37,
+              "id": 10,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 29,
+              "waiting": 27
+            },
+            {
+              "arrival": 11,
+              "completion": 41,
+              "first_run": 39,
+              "id": 11,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 30,
+              "waiting": 28
+            },
+            {
+              "arrival": 12,
+              "completion": 43,
+              "first_run": 41,
+              "id": 12,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 31,
+              "waiting": 29
+            },
+            {
+              "arrival": 0,
+              "completion": 18,
+              "first_run": 0,
+              "id": 13,
+              "priority": 0,
+              "service": 18,
+              "turnaround": 18,
+              "waiting": 0
+            },
+            {
+              "arrival": 0,
+              "completion": 19,
+              "first_run": 18,
+              "id": 14,
+              "priority": 0,
+              "service": 1,
+              "turnaround": 19,
+              "waiting": 18
+            }
+          ],
+          "max_waiting": 43,
+          "mean_turnaround": 28.4,
+          "mean_waiting": 22.8667,
+          "p95_waiting": 43,
+          "policy": "priority-non-preemptive",
+          "starvation_count": 0,
+          "starvation_threshold": 50,
+          "total_time": 83
+        },
+        "round_robin": {
+          "jobs": [
+            {
+              "arrival": 0,
+              "completion": 83,
+              "first_run": 0,
+              "id": 0,
+              "priority": 5,
+              "service": 40,
+              "turnaround": 83,
+              "waiting": 43
+            },
+            {
+              "arrival": 1,
+              "completion": 13,
+              "first_run": 11,
+              "id": 1,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 12,
+              "waiting": 10
+            },
+            {
+              "arrival": 2,
+              "completion": 15,
+              "first_run": 13,
+              "id": 2,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 13,
+              "waiting": 11
+            },
+            {
+              "arrival": 3,
+              "completion": 17,
+              "first_run": 15,
+              "id": 3,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 14,
+              "waiting": 12
+            },
+            {
+              "arrival": 4,
+              "completion": 19,
+              "first_run": 17,
+              "id": 4,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 15,
+              "waiting": 13
+            },
+            {
+              "arrival": 5,
+              "completion": 21,
+              "first_run": 19,
+              "id": 5,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 16,
+              "waiting": 14
+            },
+            {
+              "arrival": 6,
+              "completion": 28,
+              "first_run": 26,
+              "id": 6,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 22,
+              "waiting": 20
+            },
+            {
+              "arrival": 7,
+              "completion": 30,
+              "first_run": 28,
+              "id": 7,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 23,
+              "waiting": 21
+            },
+            {
+              "arrival": 8,
+              "completion": 32,
+              "first_run": 30,
+              "id": 8,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 24,
+              "waiting": 22
+            },
+            {
+              "arrival": 9,
+              "completion": 34,
+              "first_run": 32,
+              "id": 9,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 25,
+              "waiting": 23
+            },
+            {
+              "arrival": 10,
+              "completion": 36,
+              "first_run": 34,
+              "id": 10,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 26,
+              "waiting": 24
+            },
+            {
+              "arrival": 11,
+              "completion": 43,
+              "first_run": 41,
+              "id": 11,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 32,
+              "waiting": 30
+            },
+            {
+              "arrival": 12,
+              "completion": 45,
+              "first_run": 43,
+              "id": 12,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 33,
+              "waiting": 31
+            },
+            {
+              "arrival": 0,
+              "completion": 63,
+              "first_run": 5,
+              "id": 13,
+              "priority": 0,
+              "service": 18,
+              "turnaround": 63,
+              "waiting": 45
+            },
+            {
+              "arrival": 0,
+              "completion": 11,
+              "first_run": 10,
+              "id": 14,
+              "priority": 0,
+              "service": 1,
+              "turnaround": 11,
+              "waiting": 10
+            }
+          ],
+          "max_waiting": 45,
+          "mean_turnaround": 27.4667,
+          "mean_waiting": 21.9333,
+          "p95_waiting": 45,
+          "policy": "round-robin",
+          "starvation_count": 0,
+          "starvation_threshold": 50,
+          "total_time": 83
+        },
+        "shortest_job_first": {
+          "jobs": [
+            {
+              "arrival": 0,
+              "completion": 83,
+              "first_run": 43,
+              "id": 0,
+              "priority": 5,
+              "service": 40,
+              "turnaround": 83,
+              "waiting": 43
+            },
+            {
+              "arrival": 1,
+              "completion": 3,
+              "first_run": 1,
+              "id": 1,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 2,
+              "waiting": 0
+            },
+            {
+              "arrival": 2,
+              "completion": 5,
+              "first_run": 3,
+              "id": 2,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 3,
+              "waiting": 1
+            },
+            {
+              "arrival": 3,
+              "completion": 7,
+              "first_run": 5,
+              "id": 3,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 4,
+              "waiting": 2
+            },
+            {
+              "arrival": 4,
+              "completion": 9,
+              "first_run": 7,
+              "id": 4,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 5,
+              "waiting": 3
+            },
+            {
+              "arrival": 5,
+              "completion": 11,
+              "first_run": 9,
+              "id": 5,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 6,
+              "waiting": 4
+            },
+            {
+              "arrival": 6,
+              "completion": 13,
+              "first_run": 11,
+              "id": 6,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 7,
+              "waiting": 5
+            },
+            {
+              "arrival": 7,
+              "completion": 15,
+              "first_run": 13,
+              "id": 7,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 8,
+              "waiting": 6
+            },
+            {
+              "arrival": 8,
+              "completion": 17,
+              "first_run": 15,
+              "id": 8,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 9,
+              "waiting": 7
+            },
+            {
+              "arrival": 9,
+              "completion": 19,
+              "first_run": 17,
+              "id": 9,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 10,
+              "waiting": 8
+            },
+            {
+              "arrival": 10,
+              "completion": 21,
+              "first_run": 19,
+              "id": 10,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 11,
+              "waiting": 9
+            },
+            {
+              "arrival": 11,
+              "completion": 23,
+              "first_run": 21,
+              "id": 11,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 12,
+              "waiting": 10
+            },
+            {
+              "arrival": 12,
+              "completion": 25,
+              "first_run": 23,
+              "id": 12,
+              "priority": 1,
+              "service": 2,
+              "turnaround": 13,
+              "waiting": 11
+            },
+            {
+              "arrival": 0,
+              "completion": 43,
+              "first_run": 25,
+              "id": 13,
+              "priority": 0,
+              "service": 18,
+              "turnaround": 43,
+              "waiting": 25
+            },
+            {
+              "arrival": 0,
+              "completion": 1,
+              "first_run": 0,
+              "id": 14,
+              "priority": 0,
+              "service": 1,
+              "turnaround": 1,
+              "waiting": 0
+            }
+          ],
+          "max_waiting": 43,
+          "mean_turnaround": 14.4667,
+          "mean_waiting": 8.93333,
+          "p95_waiting": 43,
+          "policy": "shortest-job-first",
+          "starvation_count": 0,
+          "starvation_threshold": 50,
+          "total_time": 83
+        }
+      },
+      "workload": "one long job, many short interactive jobs, two high-priority jobs"
+    },
+    {
+      "data_pages": 125,
+      "format": "fixed-row + 4KiB pages + in-memory B+tree index",
+      "index_height": 3,
+      "index_internal_splits": 13,
+      "index_leaf_count": 250,
+      "index_leaf_splits": 249,
+      "index_rebuild": {
+        "max_ms": 0.339917,
+        "mean_ms": 0.339312,
+        "min_ms": 0.337916,
+        "name": "page-scan-index-rebuild",
+        "p50_ms": 0.339458,
+        "p95_ms": 0.339917,
+        "repetitions": 8,
+        "stddev_ms": 0.000599,
+        "warmup": 2
+      },
+      "indexed_lookup": {
+        "max_ms": 0.375292,
+        "mean_ms": 0.369885,
+        "min_ms": 0.365958,
+        "name": "bplus-index-page-lookup",
+        "p50_ms": 0.368645,
+        "p95_ms": 0.375161,
+        "repetitions": 8,
+        "stddev_ms": 0.003383,
+        "warmup": 2
+      },
+      "lab": "storage-engine",
+      "page_size_bytes": 4096,
+      "queries": 300,
+      "query_seed": 11400714819323198485,
+      "range_rows": 32,
+      "row_size_bytes": 128,
+      "rows": 4000,
+      "rows_per_page": 32,
+      "sequential_scan": {
+        "max_ms": 32.865167,
+        "mean_ms": 31.934776,
+        "min_ms": 31.397541,
+        "name": "page-backed-sequential-scan",
+        "p50_ms": 31.635042,
+        "p95_ms": 32.777813,
+        "repetitions": 8,
+        "stddev_ms": 0.585663,
+        "warmup": 2
+      }
+    },
+    {
+      "alignment_bytes": 8,
+      "benchmark": {
+        "coalesced": {
+          "max_ms": 2.338416,
+          "mean_ms": 2.324823,
+          "min_ms": 2.317042,
+          "name": "free-list-with-coalescing",
+          "p50_ms": 2.321395,
+          "p95_ms": 2.335879,
+          "repetitions": 8,
+          "stddev_ms": 0.006818,
+          "warmup": 2
+        },
+        "no_coalesce": {
+          "max_ms": 3.3585,
+          "mean_ms": 3.350307,
+          "min_ms": 3.34675,
+          "name": "free-list-no-coalescing",
+          "p50_ms": 3.348834,
+          "p95_ms": 3.356575,
+          "repetitions": 8,
+          "stddev_ms": 0.003528,
+          "warmup": 2
+        }
+      },
+      "fragmentation_probe": {
+        "coalesced": {
+          "allocations": 4,
+          "block_count": 4,
+          "capacity_bytes": 1280,
+          "external_fragmentation_bytes": 120,
+          "failed_allocations": 0,
+          "free_payload_bytes": 640,
+          "frees": 2,
+          "internal_fragmentation_bytes": 0,
+          "largest_free_block_bytes": 520,
+          "live_requested_bytes": 480,
+          "live_reserved_bytes": 480,
+          "peak_live_reserved_bytes": 960,
+          "reused_allocations": 0
+        },
+        "no_coalesce": {
+          "allocations": 4,
+          "block_count": 5,
+          "capacity_bytes": 1280,
+          "external_fragmentation_bytes": 360,
+          "failed_allocations": 0,
+          "free_payload_bytes": 600,
+          "frees": 2,
+          "internal_fragmentation_bytes": 0,
+          "largest_free_block_bytes": 240,
+          "live_requested_bytes": 480,
+          "live_reserved_bytes": 480,
+          "peak_live_reserved_bytes": 960,
+          "reused_allocations": 0
+        }
+      },
+      "intentional_failures": {
+        "bump_cannot_reuse_free": true,
+        "large_allocation_with_coalescing": true,
+        "large_allocation_without_coalescing": false
+      },
+      "lab": "allocator",
+      "metadata_bytes_per_block": 40,
+      "mixed": {
+        "coalesced": {
+          "peak_active": 969,
+          "stats": {
+            "allocations": 5484,
+            "block_count": 1,
+            "capacity_bytes": 1048576,
+            "external_fragmentation_bytes": 0,
+            "failed_allocations": 0,
+            "free_payload_bytes": 1048536,
+            "frees": 5484,
+            "internal_fragmentation_bytes": 0,
+            "largest_free_block_bytes": 1048536,
+            "live_requested_bytes": 0,
+            "live_reserved_bytes": 0,
+            "peak_live_reserved_bytes": 138488,
+            "reused_allocations": 3760
+          }
+        },
+        "no_coalesce": {
+          "peak_active": 969,
+          "stats": {
+            "allocations": 5484,
+            "block_count": 1536,
+            "capacity_bytes": 1048576,
+            "external_fragmentation_bytes": 154136,
+            "failed_allocations": 0,
+            "free_payload_bytes": 987136,
+            "frees": 5484,
+            "internal_fragmentation_bytes": 0,
+            "largest_free_block_bytes": 833000,
+            "live_requested_bytes": 0,
+            "live_reserved_bytes": 0,
+            "peak_live_reserved_bytes": 139248,
+            "reused_allocations": 4487
+          }
+        }
+      },
+      "operations": 10000,
+      "seed": 1592594996
+    },
+    {
+      "block_size_bytes": 16,
+      "content": "path lookup reaches inode metadata before data blocks",
+      "file_stat": {
+        "block_count": 4,
+        "inode": 3,
+        "reference_count": 2,
+        "size_bytes": 53,
+        "type": "regular-file"
+      },
+      "inode_count": 4,
+      "lab": "toy-filesystem",
+      "link_stat": {
+        "block_count": 4,
+        "inode": 3,
+        "reference_count": 2,
+        "size_bytes": 53,
+        "type": "regular-file"
+      },
+      "lookup": {
+        "max_ms": 0.414375,
+        "mean_ms": 0.394005,
+        "min_ms": 0.373583,
+        "name": "path-directory-inode-lookup",
+        "p50_ms": 0.385916,
+        "p95_ms": 0.413908,
+        "repetitions": 8,
+        "stddev_ms": 0.014522,
+        "warmup": 1
+      },
+      "model": "path -> directory entry -> inode-like metadata -> fixed-size blocks",
+      "same_inode_for_hard_link": true,
+      "traversal_rejected": true
+    },
+    {
+      "benchmarks": {
+        "protocol_parse": {
+          "max_ms": 0.044125,
+          "mean_ms": 0.042917,
+          "min_ms": 0.042125,
+          "name": "serial-protocol-parse",
+          "p50_ms": 0.042583,
+          "p95_ms": 0.043975,
+          "repetitions": 10,
+          "stddev_ms": 0.000765,
+          "warmup": 1
+        },
+        "scheduler_sim": {
+          "max_ms": 0.001083,
+          "mean_ms": 0.000375,
+          "min_ms": 0.00025,
+          "name": "cooperative-scheduler-sim",
+          "p50_ms": 0.000291,
+          "p95_ms": 0.000802,
+          "repetitions": 10,
+          "stddev_ms": 0.000244,
+          "warmup": 1
+        }
+      },
+      "hal": [
+        "sensor",
+        "actuator",
+        "clock",
+        "serial"
+      ],
+      "hardware": {
+        "claim": "deterministic simulator and HAL boundary only; no physical MCU timing is claimed",
+        "physical_mcu_detected": false
+      },
+      "lab": "firmware-boundary",
+      "memory_mapped_io": {
+        "base": "0x40000000 simulated",
+        "digest": 34,
+        "uses_bit_masks": true
+      },
+      "polling_vs_event": {
+        "event_max_latency_us": 35,
+        "event_mean_latency_us": 35.0,
+        "events": 6,
+        "polling_checks": 78,
+        "polling_max_latency_us": 990,
+        "polling_mean_latency_us": 469.833333
+      },
+      "resource_budget": {
+        "memory_budget_bytes": 65536,
+        "protocol_max_payload": 32,
+        "static_ring_bytes": 256,
+        "within_budget": true
+      },
+      "ring_buffer": {
+        "overwrite_oldest": {
+          "capacity": 8,
+          "high_watermark": 8,
+          "overwritten": 4,
+          "popped": 3,
+          "pushed": 12,
+          "rejected": 0,
+          "size": 5
+        },
+        "reject": {
+          "capacity": 8,
+          "high_watermark": 8,
+          "overwritten": 0,
+          "popped": 3,
+          "pushed": 8,
+          "rejected": 4,
+          "size": 5
+        }
+      },
+      "scheduler": {
+        "horizon_ms": 250,
+        "idle_ms": 0,
+        "tasks": [
+          {
+            "deadline_misses": 14,
+            "max_jitter_ms": 127,
+            "mean_jitter_ms": 50.789474,
+            "name": "sensor-sample",
+            "overruns": 0,
+            "runs": 19
+          },
+          {
+            "deadline_misses": 7,
+            "max_jitter_ms": 132,
+            "mean_jitter_ms": 56.0,
+            "name": "serial-drain",
+            "overruns": 0,
+            "runs": 10
+          },
+          {
+            "deadline_misses": 2,
+            "max_jitter_ms": 119,
+            "mean_jitter_ms": 56.0,
+            "name": "telemetry",
+            "overruns": 0,
+            "runs": 4
+          },
+          {
+            "deadline_misses": 2,
+            "max_jitter_ms": 85,
+            "mean_jitter_ms": 46.0,
+            "name": "flash-write",
+            "overruns": 2,
+            "runs": 2
+          }
+        ]
+      },
+      "serial_protocol": {
+        "accepted_mutated_frames": 4,
+        "fault_stats": {
+          "checksum_errors": 1,
+          "frames": 1,
+          "ignored_bytes": 0,
+          "oversized_payloads": 1,
+          "timeout_resets": 1
+        },
+        "frame_shape": "SOF TYPE LENGTH PAYLOAD CHECKSUM"
+      },
+      "sink": 374000,
+      "state_machine": {
+        "final_state": "IDLE",
+        "transitions": [
+          {
+            "at_ms": 20,
+            "from": "IDLE",
+            "reason": "filtered-temp-crossed-arm-threshold",
+            "to": "ARMED"
+          },
+          {
+            "at_ms": 30,
+            "from": "ARMED",
+            "reason": "filtered-temp-crossed-active-threshold",
+            "to": "ACTIVE"
+          },
+          {
+            "at_ms": 140,
+            "from": "ACTIVE",
+            "reason": "invalid-or-stale",
+            "to": "FAULT"
+          },
+          {
+            "at_ms": 170,
+            "from": "FAULT",
+            "reason": "valid-sample-after-fault",
+            "to": "RECOVERY"
+          },
+          {
+            "at_ms": 180,
+            "from": "RECOVERY",
+            "reason": "recovered-to-idle-band",
+            "to": "IDLE"
+          }
+        ]
+      }
+    },
+    {
+      "benchmark": {
+        "max_ms": 0.227959,
+        "mean_ms": 0.218825,
+        "min_ms": 0.210541,
+        "name": "deterministic-hal-state-machine",
+        "p50_ms": 0.218479,
+        "p95_ms": 0.227509,
+        "repetitions": 10,
+        "stddev_ms": 0.00712,
+        "warmup": 2
+      },
+      "events": [
+        {
+          "reason": "simulated-overtemp-event",
+          "temperature_c": 28.5,
+          "tick": 3
+        },
+        {
+          "reason": "cooldown-threshold",
+          "temperature_c": 26,
+          "tick": 6
+        },
+        {
+          "reason": "simulated-overtemp-event",
+          "temperature_c": 29,
+          "tick": 8
+        },
+        {
+          "reason": "cooldown-threshold",
+          "temperature_c": 25,
+          "tick": 10
+        }
+      ],
+      "hal_boundary": "DigitalOutput interface",
+      "hardware_claim": false,
+      "input": "scripted temperature samples",
+      "lab": "embedded-simulator",
+      "output_transitions": [
+        {
+          "high": true,
+          "tick": 3
+        },
+        {
+          "high": false,
+          "tick": 6
+        },
+        {
+          "high": true,
+          "tick": 8
+        },
+        {
+          "high": false,
+          "tick": 10
+        }
+      ],
+      "samples": 11
+    },
+    {
+      "architecture": [
+        "TCP client",
+        "binary frame",
+        "parser",
+        "bounded queue",
+        "priority worker scheduler",
+        "append-only journal",
+        "idempotency index",
+        "recovery",
+        "query snapshot"
+      ],
+      "benchmarks": {
+        "network": {
+          "max_ms": 51.9652,
+          "mean_ms": 51.9652,
+          "min_ms": 51.9652,
+          "name": "capstone-loopback-tcp",
+          "p50_ms": 51.9652,
+          "p95_ms": 51.9652,
+          "repetitions": 1,
+          "stddev_ms": 0,
+          "warmup": 0
+        },
+        "parser": {
+          "max_ms": 0.145,
+          "mean_ms": 0.145,
+          "min_ms": 0.145,
+          "name": "capstone-protocol-parse",
+          "p50_ms": 0.145,
+          "p95_ms": 0.145,
+          "repetitions": 1,
+          "stddev_ms": 0,
+          "warmup": 0
+        },
+        "recovery": {
+          "max_ms": 0.87575,
+          "mean_ms": 0.87575,
+          "min_ms": 0.87575,
+          "name": "capstone-recovery-campaign",
+          "p50_ms": 0.87575,
+          "p95_ms": 0.87575,
+          "repetitions": 1,
+          "stddev_ms": 0,
+          "warmup": 0
+        }
+      },
+      "custom_data_structures": [
+        "RingBuffer",
+        "BinaryMinHeap",
+        "LinearProbeHashTable"
+      ],
+      "failure_campaign": {
+        "corrupt_tail_ignored": true,
+        "duplicate_idempotent": true,
+        "invalid_records_seen": 2,
+        "network_drop_reset": true,
+        "queue_full_rejected": true,
+        "retry_succeeded": true,
+        "running_recovered": true,
+        "snapshot": {
+          "failed": 0,
+          "pending": 0,
+          "queue_high_watermark": 2,
+          "ready_queue_size": 0,
+          "retry_wait": 0,
+          "running": 0,
+          "succeeded": 2,
+          "total_jobs": 2
+        },
+        "truncated_tail_ignored": true
+      },
+      "invariants": [
+        "duplicate request IDs map to one logical job",
+        "invalid journal records do not mutate state",
+        "running jobs are moved to retry wait on recovery",
+        "completed jobs are not returned to pending",
+        "bounded queue rejects excess accepted work"
+      ],
+      "lab": "durable-job-runtime",
+      "performance_campaign": [
+        {
+          "accepted": 1,
+          "bytes_received": 21,
+          "clients": 1,
+          "elapsed_ms": 5.34483,
+          "frames": 1,
+          "partial_reads": 2,
+          "throughput_jobs_per_sec": 187.097
+        },
+        {
+          "accepted": 10,
+          "bytes_received": 210,
+          "clients": 10,
+          "elapsed_ms": 52.1691,
+          "frames": 10,
+          "partial_reads": 20,
+          "throughput_jobs_per_sec": 191.684
+        },
+        {
+          "accepted": 100,
+          "bytes_received": 2190,
+          "clients": 100,
+          "elapsed_ms": 459.261,
+          "frames": 100,
+          "partial_reads": 200,
+          "throughput_jobs_per_sec": 217.741
+        }
+      ],
+      "scheduler_choice": {
+        "arrival_order_first_job": 1,
+        "priority_runtime_first_job": 2
+      },
+      "sink": 34024
+    },
+    {
+      "interpretation": "event loop uses kqueue on macOS and poll fallback on CI; socketpair workload models partial reads and idle/slow peer cost without claiming internet throughput",
+      "lab": "event-loop-reality",
+      "results": [
+        {
+          "bytes": 4096,
+          "clients": 32,
+          "elapsed_ms": 30.4694,
+          "event_backend": "none",
+          "mode": "blocking-serial",
+          "read_calls": 70,
+          "throughput_bytes_per_sec": 134430
+        },
+        {
+          "bytes": 4096,
+          "clients": 32,
+          "elapsed_ms": 99.3338,
+          "event_backend": "pthread",
+          "mode": "thread-per-client",
+          "read_calls": 249,
+          "throughput_bytes_per_sec": 41234.7
+        },
+        {
+          "bytes": 4096,
+          "clients": 32,
+          "elapsed_ms": 96.3535,
+          "event_backend": "kqueue",
+          "mode": "event-loop",
+          "read_calls": 256,
+          "throughput_bytes_per_sec": 42510.1
+        }
+      ],
+      "workload": {
+        "bytes_per_client": 128,
+        "chunk": 16,
+        "clients": 32,
+        "slow_first_ms": 20
+      }
+    },
+    {
+      "bug": "heap use-after-free and signed-overflow fixtures are disabled by default",
+      "default_safe": true,
+      "investigation": "tools/run_debugging_case.sh attempts ASan for UAF and falls back to UBSan signed-overflow evidence if this macOS ASan runtime is unavailable",
+      "lab": "debugging-case"
+    }
+  ],
+  "method": {
+    "clock": "steady_clock",
+    "summary": "warm-up followed by repeated wall-clock samples; each lab reports mean/stddev/p50/p95/min/max"
+  },
+  "profile": "standard",
+  "project": "beneath-the-stack",
+  "schema_version": 2
+}

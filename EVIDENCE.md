@@ -37,8 +37,8 @@ artifact should not be treated as finished evidence.
 
 | Field | Value |
 | --- | --- |
-| Source commit measured | `TBD_AFTER_SOURCE_COMMIT` |
-| Evidence files | `evidence/v0.7-macbook-air.json`, `evidence/v0.7-macbook-air.csv`, `evidence/v0.7-postgres-reality.json`, `evidence/debugger/v0.7-debugging-case-summary.json` |
+| Source commit measured | `f14385e06512312e4641153a1dd1ae7c7b2c47a9` |
+| Evidence files | `evidence/v0.7-macbook-air.json`, `evidence/v0.7-macbook-air.csv`, `evidence/v0.7-postgres-reality.json`, `evidence/v0.7-capstone-campaign.json`, `evidence/debugger/v0.7-debugging-case-summary.json` |
 | Labs | 21 |
 | Reality checks | PostgreSQL planner/MVCC/locks/WAL, macOS kqueue/poll event-loop lab, sanitizer debugging case |
 | Hardware claim | physical MCU still not claimed |

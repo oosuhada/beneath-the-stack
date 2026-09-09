@@ -1,3 +1,64 @@
+# v0.7 real-systems validation evidence
+
+v0.7 checks the remaining gap between toy/control experiments and real runtimes. Raw evidence is
+committed as:
+
+- [`evidence/v0.7-macbook-air.json`](../evidence/v0.7-macbook-air.json)
+- [`evidence/v0.7-macbook-air.csv`](../evidence/v0.7-macbook-air.csv)
+- [`evidence/v0.7-postgres-reality.json`](../evidence/v0.7-postgres-reality.json)
+- [`evidence/v0.7-capstone-campaign.json`](../evidence/v0.7-capstone-campaign.json)
+- [`evidence/debugger/v0.7-debugging-case-summary.json`](../evidence/debugger/v0.7-debugging-case-summary.json)
+- [`evidence/hardware/v0.7-macbook-air-probe.txt`](../evidence/hardware/v0.7-macbook-air-probe.txt)
+
+| Field | v0.7 value |
+| --- | --- |
+| Source commit measured | `f14385e06512312e4641153a1dd1ae7c7b2c47a9` |
+| Executable labs | 21 |
+| Normalized benchmark records | 56 |
+| PostgreSQL version | PostgreSQL 18.4 Homebrew on aarch64-apple-darwin25.4.0 |
+| PostgreSQL source reference | `25b21c0bb712b615f22cf5fcc176764a416368bd` |
+| Physical MCU detected | no |
+
+## PostgreSQL reality observations
+
+| Probe | Observed result | Buffer / timing evidence |
+| --- | --- | --- |
+| Broad `status='done'` aggregate | `Aggregate -> Seq Scan` | 456 shared hit blocks, 1.513 ms execution |
+| Composite ordered lookup | `Limit -> Index Scan` | 10 shared hits, 4 shared reads, 0.035 ms execution |
+| Selective predicate | `Bitmap Index Scan -> Bitmap Heap Scan` | 104 shared hits, 0.148 ms execution |
+| MVCC visibility | second reader saw `pending` before commit and `running` after commit | `visible_only_after_commit: true` |
+| Lock wait | conflicting update failed under `lock_timeout` | `lock_timeout_observed: true` |
+| Deadlock | opposite row lock order aborted one side | `deadlock_detected: true`, `one_transaction_aborted: true` |
+| WAL position | update workload advanced LSN by 37,576 bytes | `pg_wal_lsn_diff(after,before)` |
+
+## Event-loop reality observations
+
+The event-loop lab uses `socketpair` so every strategy sees the same local kernel-socket workload.
+On this MacBook Air run the event backend was `kqueue`. These are host-side measurements, not remote
+network throughput claims.
+
+| Mode | Backend | Clients | Bytes | Read calls | Elapsed | Throughput |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| blocking serial | none | 32 | 4,096 | 70 | 30.469 ms | 134,430 B/s |
+| thread per client | pthread | 32 | 4,096 | 249 | 99.334 ms | 41,235 B/s |
+| event loop | kqueue | 32 | 4,096 | 256 | 96.354 ms | 42,510 B/s |
+
+The important result is not “kqueue is always faster.” In this small socketpair workload, blocking
+serial won the elapsed time because the delayed peer and tiny payload dominate. The stronger claim is
+source-level: the event-loop path handled many descriptors, partial reads and EOF without one thread
+per connection. The first implementation under-counted bytes/hung around EOF and was fixed before
+release evidence.
+
+## Debugging evidence
+
+| Probe | Result |
+| --- | --- |
+| ASan use-after-free fixture | attempted, but this macOS sanitizer runtime aborted before a normal UAF report; not claimed as success |
+| UBSan signed overflow fixture | detected source-line signed integer overflow; exit status 134 |
+| Fixed path | plain binary returns safe JSON with `value=3` and saturating add at `INT_MAX` |
+
+---
+
 # v0.6 cross-layer capstone evidence
 
 v0.6 adds one integrated system, `durable-job-runtime`, instead of expanding the topic list. Raw

@@ -1,0 +1,22 @@
+{
+  "asan": {
+    "buggy_exit_status": 134,
+    "detected_heap_use_after_free": false,
+    "raw_report": "evidence/debugger/v0.7-asan-use-after-free.txt",
+    "runtime_note": "If detected is false on macOS, inspect the raw report; this environment has previously failed inside the ASan runtime before producing a normal UAF report."
+  },
+  "compiler": "Apple clang version 16.0.0 (clang-1600.0.26.3)",
+  "fixed_output": {
+    "lab": "debugging-case",
+    "mode": "fixed",
+    "saturating_add": 2147483647,
+    "value": 3
+  },
+  "root_cause": "debugging fixtures preserve a concrete symptom -> sanitizer report -> source-level fix path; UAF reads after delete[], overflow exceeds int range before a scheduler-like score can be compared safely",
+  "source_commit": "f14385e06512312e4641153a1dd1ae7c7b2c47a9",
+  "ubsan": {
+    "buggy_exit_status": 134,
+    "detected_signed_integer_overflow": true,
+    "raw_report": "evidence/debugger/v0.7-ubsan-signed-overflow.txt"
+  }
+}
