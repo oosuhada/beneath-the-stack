@@ -1,0 +1,40 @@
+# v0.5 MacBook Air hardware probe
+
+Date: 2026-09-09 Asia/Seoul
+
+Purpose: determine whether the embedded track can claim physical MCU/serial measurements.
+
+Commands used:
+
+```text
+ls -1 /dev/cu.* /dev/tty.*
+system_profiler SPUSBDataType | egrep -i 'Raspberry|Pico|Arduino|ESP32|CP210|CH340|serial|USB Serial|FTDI|MicroPython|Espressif'
+```
+
+Observed serial-style devices:
+
+```text
+/dev/cu.Bluetooth-Incoming-Port
+/dev/cu.BoseQCUltraHeadphones
+/dev/cu.OosusBoseQC35II
+/dev/cu.debug-console
+/dev/tty.Bluetooth-Incoming-Port
+/dev/tty.BoseQCUltraHeadphones
+/dev/tty.OosusBoseQC35II
+/dev/tty.debug-console
+```
+
+USB keyword probe result:
+
+```text
+no Raspberry Pi Pico / ESP32 / Arduino / CP210 / CH340 / FTDI / MicroPython / Espressif match
+```
+
+Conclusion:
+
+```text
+No physical MCU or USB serial device was detected.
+v0.5 uses deterministic simulator-first firmware architecture.
+No physical GPIO, UART, timer interrupt, binary size, RAM usage, stack usage or board flashing claim
+is made.
+```

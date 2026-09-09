@@ -7,6 +7,7 @@
 #include "bts/allocator.hpp"
 #include "bts/data_structures.hpp"
 #include "bts/embedded.hpp"
+#include "bts/firmware.hpp"
 #include "bts/http.hpp"
 #include "bts/scheduler.hpp"
 #include "bts/toy_filesystem.hpp"
@@ -255,6 +256,64 @@ void test_embedded_simulator() {
       "embedded controller rejects inverted hysteresis thresholds");
 }
 
+void test_firmware_boundary() {
+  bts::RingBuffer<4> reject(bts::RingOverflowPolicy::kReject);
+  check(reject.push(1) && reject.push(2) && reject.push(3) && reject.push(4),
+        "ring buffer accepts bounded UART bytes until capacity");
+  check(!reject.push(5) && reject.stats().rejected == 1,
+        "reject-policy ring buffer makes overflow explicit instead of allocating");
+  check(reject.pop() == 1 && reject.pop() == 2, "ring buffer preserves FIFO order");
+
+  bts::RingBuffer<4> overwrite(bts::RingOverflowPolicy::kOverwriteOldest);
+  for (std::uint8_t value = 0; value < 6; ++value) {
+    (void)overwrite.push(value);
+  }
+  check(overwrite.stats().overwritten == 2 && overwrite.pop() == 2,
+        "overwrite-policy ring buffer drops oldest bytes deterministically");
+
+  bts::ProtocolParser parser;
+  bts::SerialFrame frame;
+  bool completed = false;
+  for (std::uint8_t byte : bts::encode_frame(bts::SerialFrame{0x42, {7, 8}})) {
+    completed = parser.feed(byte, frame) || completed;
+  }
+  check(completed && frame.type == 0x42 && frame.payload == std::vector<std::uint8_t>({7, 8}),
+        "serial protocol parser reconstructs a framed packet across bytes");
+  auto corrupt = bts::encode_frame(bts::SerialFrame{0x42, {7, 8}});
+  corrupt.back() ^= 0x1U;
+  for (std::uint8_t byte : corrupt) {
+    (void)parser.feed(byte, frame);
+  }
+  check(parser.stats().checksum_errors == 1, "serial parser rejects corrupted checksum");
+
+  const auto latency = bts::compare_polling_and_events({750, 1750, 2600}, 1000, 25);
+  check(latency.polling_max_latency_us > latency.event_max_latency_us,
+        "interrupt-like event dispatch lowers worst-case response latency in this model");
+
+  bts::SimulatedActuator actuator;
+  bts::FirmwareController controller({}, actuator);
+  for (const auto sample :
+       {bts::SensorSample{0, 24.0, true, true}, bts::SensorSample{10, 35.0, true, true},
+        bts::SensorSample{80, 200.0, true, true}, bts::SensorSample{90, 23.0, true, true}}) {
+    controller.on_sample(sample);
+  }
+  check(controller.state() == bts::FirmwareState::kRecovery && !actuator.enabled(),
+        "capstone controller enters a safe recovery path after injected sensor fault");
+
+  const auto schedule = bts::simulate_cooperative_scheduler(
+      {{"fast", 10, 1}, {"long", 50, 80}, {"telemetry", 100, 2}}, 160);
+  check(schedule.tasks[1].overruns > 0 && schedule.tasks[0].deadline_misses > 0,
+        "cooperative scheduler exposes deadline damage from a long-running task");
+
+  bts::SimulatedMmio mmio;
+  constexpr std::uint32_t led = 1U << 5U;
+  mmio.set_bits(bts::SimulatedMmio::kGpioDirection, led);
+  mmio.toggle_bits(bts::SimulatedMmio::kGpioOutput, led);
+  check(mmio.any(bts::SimulatedMmio::kGpioDirection, led) &&
+            mmio.any(bts::SimulatedMmio::kGpioOutput, led),
+        "simulated MMIO register uses masks to set and toggle a GPIO bit");
+}
+
 void test_scheduler_simulator() {
   const std::vector<bts::SchedulerJob> jobs{
       {0, 0, 20, 5}, {1, 0, 2, 0}, {2, 1, 2, 0}, {3, 2, 2, 0}};
@@ -297,6 +356,7 @@ int main() {
   test_allocator();
   test_toy_storage();
   test_embedded_simulator();
+  test_firmware_boundary();
   test_scheduler_simulator();
   test_toy_filesystem();
   if (failures != 0) {

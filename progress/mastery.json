@@ -115,7 +115,14 @@
       "name": "Embedded / Hardware",
       "topics": [
         {"topic": "HAL + deterministic simulator", "level": 4, "artifacts": ["include/bts/embedded.hpp", "tests/mastery_tests.cpp", "labs/embedded_sim/main.cpp", "docs/interview/embedded-hal.md"]},
-        {"topic": "event → state machine → output", "level": 4, "artifacts": ["include/bts/embedded.hpp", "tests/mastery_tests.cpp", "labs/embedded_sim/main.cpp"]},
+        {"topic": "firmware HAL architecture", "level": 4, "artifacts": ["include/bts/firmware.hpp", "labs/firmware_boundary/main.cpp", "tests/mastery_tests.cpp", "docs/adr/ADR-011-simulator-first-firmware-boundary.md"]},
+        {"topic": "event → state machine → output", "level": 4, "artifacts": ["include/bts/embedded.hpp", "include/bts/firmware.hpp", "tests/mastery_tests.cpp", "labs/embedded_sim/main.cpp", "labs/firmware_boundary/main.cpp"]},
+        {"topic": "polling vs interrupt-like event latency", "level": 4, "artifacts": ["include/bts/firmware.hpp", "labs/firmware_boundary/main.cpp", "docs/notebook/2026-09-09-firmware-boundary.md"]},
+        {"topic": "serial framing / checksum parser", "level": 4, "artifacts": ["include/bts/firmware.hpp", "labs/firmware_boundary/main.cpp", "tests/mastery_tests.cpp", "docs/source-reading/mcu-hal-gpio-timer-serial.md"]},
+        {"topic": "bounded ring buffer", "level": 4, "artifacts": ["include/bts/firmware.hpp", "labs/firmware_boundary/main.cpp", "tests/mastery_tests.cpp", "docs/adr/ADR-012-ring-buffer-overflow-policy.md"]},
+        {"topic": "cooperative firmware scheduler / jitter", "level": 4, "artifacts": ["include/bts/firmware.hpp", "labs/firmware_boundary/main.cpp", "docs/source-reading/freertos-task-queue.md"]},
+        {"topic": "simulated memory-mapped I/O / bit masks", "level": 4, "artifacts": ["include/bts/firmware.hpp", "labs/firmware_boundary/main.cpp", "tests/mastery_tests.cpp", "docs/source-reading/mcu-hal-gpio-timer-serial.md"]},
+        {"topic": "device-boundary product bridge", "level": 2, "artifacts": ["docs/product-bridges/ibridge-device-boundary.md", "https://github.com/oosuhada/iBridge-Studio/blob/deploy/docs/DEVICE_BOUNDARY_NOTES.md"]},
         {"topic": "physical GPIO / serial / interrupt", "level": 0, "artifacts": []}
       ]
     }

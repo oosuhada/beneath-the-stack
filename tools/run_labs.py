@@ -68,6 +68,7 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
             "storage_lab": ["--rows", "512", "--queries", "40", "--warmup", "1", "--repetitions", "2"],
             "allocator_lab": ["--operations", "1500", "--warmup", "1", "--repetitions", "2"],
             "toy_filesystem_lab": ["--warmup", "1", "--repetitions", "2"],
+            "firmware_boundary_lab": ["--warmup", "1", "--repetitions", "2"],
             "embedded_lab": ["--warmup", "1", "--repetitions", "3"],
         }
     return {
@@ -87,6 +88,7 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
         "storage_lab": [],
         "allocator_lab": [],
         "toy_filesystem_lab": [],
+        "firmware_boundary_lab": [],
         "embedded_lab": [],
     }
 
