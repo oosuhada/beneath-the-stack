@@ -12,6 +12,8 @@ make lint
 python3 tools/run_labs.py --profile quick \
   --output /tmp/beneath-the-stack-quick.json \
   --csv-output /tmp/beneath-the-stack-quick.csv
+python3 tools/run_capstone_campaign.py \
+  --output /tmp/beneath-the-stack-capstone-campaign.json
 ```
 
 CI also runs a CMake portability check on Ubuntu.
@@ -24,6 +26,9 @@ CI also runs a CMake portability check on Ubuntu.
 - CSV normalization extracts benchmark records from nested lab outputs.
 - The capstone failure campaign emits booleans for idempotency, queue-full rejection, running-job
   recovery, corrupt-tail handling and truncated-tail handling.
+- The capstone campaign script emits a scenario-indexed JSON summary for normal, partial-packet,
+  network-drop, duplicate, worker-crash, storage-corruption, queue-full and slow-consumer-pressure
+  checks.
 
 ## What is environment-specific
 

@@ -15,7 +15,19 @@ artifact should not be treated as finished evidence.
 | Capstone recovers a running job after restart | `build/bin/durable_job_runtime_lab` | `failure_campaign.running_recovered == true` in v0.6 evidence |
 | Capstone ignores corrupt/truncated journal tail | `build/bin/durable_job_runtime_lab` | `failure_campaign.corrupt_tail_ignored`, `truncated_tail_ignored` |
 | Capstone loopback TCP path handles partial frames | `build/bin/durable_job_runtime_lab --clients 10` | `performance_campaign[].partial_reads` |
+| Capstone deterministic failure campaign is runnable as one script | `python3 tools/run_capstone_campaign.py --output evidence/v0.6-capstone-campaign.json` | normal, partial-packet, network-drop, duplicate, worker-crash, storage-corruption, queue-full and slow-consumer-pressure scenarios |
 | Product repositories were re-audited for applied patterns | per-repo git commits | Product ADR files linked from `docs/applied-concepts.md` |
+
+## v0.6 release snapshot
+
+| Field | Value |
+| --- | --- |
+| Source commit measured | `b8eb07da11dea80516e24c94462c5dcc04899a1f` |
+| Evidence files | `evidence/v0.6-macbook-air.json`, `evidence/v0.6-macbook-air.csv`, `evidence/v0.6-capstone-campaign.json` |
+| Labs | 19 |
+| Normalized benchmark records | 56 |
+| Capstone failure campaign | duplicate, queue-full, running-recovery, retry, corrupt-tail and truncated-tail cases all passed |
+| Capstone network campaign | 1/10/100 loopback clients with partial frame reads recorded |
 
 ## Reproduction command set
 

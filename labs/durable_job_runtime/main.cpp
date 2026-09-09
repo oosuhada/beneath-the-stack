@@ -80,6 +80,7 @@ void append_truncated_tail(const std::string& path) {
 struct FailureCampaignResult {
   bool duplicate_idempotent = false;
   bool running_recovered = false;
+  bool network_drop_reset = false;
   bool corrupt_tail_ignored = false;
   bool truncated_tail_ignored = false;
   bool queue_full_rejected = false;
@@ -100,6 +101,19 @@ FailureCampaignResult run_failure_campaign() {
   config.retry_delay_ms = 10;
 
   FailureCampaignResult result{};
+  {
+    bts::ProtocolParser parser(96);
+    const auto command = bts::encode_submit_command({"drop", 1, 1, "half-frame"});
+    const auto bytes = bts::encode_frame(
+        bts::SerialFrame{0x31U, std::vector<std::uint8_t>(command.begin(), command.end())});
+    for (std::size_t index = 0; index < bytes.size() / 2U; ++index) {
+      bts::SerialFrame ignored;
+      (void)parser.feed(bytes[index], ignored);
+    }
+    parser.timeout();
+    const auto stats = parser.stats();
+    result.network_drop_reset = stats.timeout_resets == 1 && stats.frames == 0;
+  }
   {
     bts::DurableJobRuntime runtime(journal, config);
     const auto first = runtime.accept({"req-a", 5, 2, "fail-once"}, 0);
@@ -415,6 +429,7 @@ int main(int argc, char** argv) {
   std::cout << "\"failure_campaign\":{"
             << "\"duplicate_idempotent\":" << (failures.duplicate_idempotent ? "true" : "false")
             << ",\"running_recovered\":" << (failures.running_recovered ? "true" : "false")
+            << ",\"network_drop_reset\":" << (failures.network_drop_reset ? "true" : "false")
             << ",\"corrupt_tail_ignored\":" << (failures.corrupt_tail_ignored ? "true" : "false")
             << ",\"truncated_tail_ignored\":"
             << (failures.truncated_tail_ignored ? "true" : "false")

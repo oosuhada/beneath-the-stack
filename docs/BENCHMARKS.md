@@ -1,3 +1,61 @@
+# v0.6 cross-layer capstone evidence
+
+v0.6 adds one integrated system, `durable-job-runtime`, instead of expanding the topic list. Raw
+machine-readable evidence is committed as:
+
+- [`evidence/v0.6-macbook-air.json`](../evidence/v0.6-macbook-air.json)
+- [`evidence/v0.6-macbook-air.csv`](../evidence/v0.6-macbook-air.csv)
+
+| Field | v0.6 value |
+| --- | --- |
+| Source commit measured | `b8eb07da11dea80516e24c94462c5dcc04899a1f` |
+| Executable labs | 19 |
+| Normalized benchmark records | 56 |
+
+The capstone composes TCP framing, parser, bounded queue, priority scheduler, append-only journal,
+idempotency index and replay recovery. Its deterministic failure campaign reported:
+
+| Failure / invariant | v0.6 result |
+| --- | --- |
+| Duplicate request ID maps to one logical job | true |
+| Dropped half-frame resets parser without command emission | true |
+| Queue full rejects distinct work before acceptance | true |
+| `RUNNING` job is recovered to retry wait after restart | true |
+| Recovered retry can later succeed | true |
+| Corrupt journal tail is ignored before state mutation | true |
+| Truncated journal tail is ignored before state mutation | true |
+| Invalid journal records seen | 2 |
+| Final jobs succeeded after campaign | 2 |
+
+The scenario wrapper is committed as `tools/run_capstone_campaign.py` and its release output is
+stored in `evidence/v0.6-capstone-campaign.json`.
+
+The networking campaign sends firmware-style binary frames over local TCP and intentionally splits
+each frame into partial writes. This measures a local parser/transport path, not remote-network
+scalability.
+
+| Clients | Accepted jobs | Frames | Bytes received | Partial reads | Elapsed | Throughput |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 1 | 1 | 21 | 2 | 5.348 ms | 186.984 jobs/s |
+| 10 | 10 | 10 | 210 | 20 | 47.515 ms | 210.460 jobs/s |
+| 100 | 100 | 100 | 2,190 | 200 | 429.009 ms | 233.096 jobs/s |
+
+| Benchmark | p50 |
+| --- | ---: |
+| Protocol parse loop | 0.151 ms |
+| Failure/recovery campaign | 0.869 ms |
+| 10-client loopback TCP campaign | 52.014 ms |
+
+Two capstone measurements were rejected before this release evidence was committed:
+
+1. The first failure campaign finished a job before restart, so `running_recovered` was false. The
+   campaign now claims a job, discards process state, replays the journal and records recovery.
+2. The first 100-client network campaign used simultaneous client threads and could fail through
+   backlog/connect timing rather than the runtime path. The release campaign uses a deterministic
+   sequence of 1/10/100 loopback clients and still records partial frame reads.
+
+---
+
 # v0.5 firmware-boundary evidence
 
 v0.5 is a simulator-first embedded/firmware track. The MacBook Air hardware probe did not detect a

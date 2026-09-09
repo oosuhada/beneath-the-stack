@@ -49,11 +49,16 @@ TCP client
 | Failure | Injection | Expected recovery behavior |
 | --- | --- | --- |
 | duplicate request | submit the same request id twice | second submit returns the original job id |
+| network drop | feed half a frame and trigger parser timeout | parser resets without emitting a command |
 | queue full | capacity two, submit three distinct requests | third request is rejected before journal accept |
 | worker crash | claim a job and discard process state before `finish` | replay demotes `RUNNING` to `RETRY_WAIT` |
 | retry | recovered job is processed later | final state becomes `SUCCEEDED` |
 | corrupt journal tail | append a bad checksum record | replay counts invalid tail and keeps prior state |
 | truncated journal tail | append incomplete record | replay counts invalid tail and keeps prior state |
+
+`tools/run_capstone_campaign.py` wraps the lab into a machine-readable scenario report for normal,
+partial-packet, network-drop, duplicate, worker-crash, storage-corruption, queue-full and
+slow-consumer-pressure cases.
 
 ## Performance campaign
 
