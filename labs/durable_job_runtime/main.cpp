@@ -420,12 +420,11 @@ int main(int argc, char** argv) {
          "\"priority worker scheduler\",\"append-only journal\",\"idempotency index\","
          "\"recovery\",\"query snapshot\"],"
       << "\"custom_data_structures\":[\"RingBuffer\",\"BinaryMinHeap\",\"LinearProbeHashTable\"],"
-      << "\"invariants\":["
-      << "\"duplicate request IDs map to one logical job\","
-      << "\"invalid journal records do not mutate state\","
-      << "\"running jobs are moved to retry wait on recovery\","
-      << "\"completed jobs are not returned to pending\","
-      << "\"bounded queue rejects excess accepted work\"],";
+         "\"invariants\":[\"duplicate request IDs map to one logical job\","
+         "\"invalid journal records do not mutate state\","
+         "\"running jobs are moved to retry wait on recovery\","
+         "\"completed jobs are not returned to pending\","
+         "\"bounded queue rejects excess accepted work\"],";
   std::cout << "\"failure_campaign\":{"
             << "\"duplicate_idempotent\":" << (failures.duplicate_idempotent ? "true" : "false")
             << ",\"running_recovered\":" << (failures.running_recovered ? "true" : "false")
