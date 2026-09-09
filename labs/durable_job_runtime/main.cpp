@@ -294,33 +294,26 @@ NetworkCampaignResult run_network_campaign(std::size_t clients) {
     }
   });
 
-  std::vector<std::thread> senders;
-  senders.reserve(clients);
   for (std::size_t index = 0; index < clients; ++index) {
-    senders.emplace_back([port, index] {
-      Fd fd(socket(AF_INET, SOCK_STREAM, 0));
-      if (fd.get() < 0) {
-        throw std::runtime_error("client socket failed");
-      }
-      sockaddr_in destination{};
-      destination.sin_family = AF_INET;
-      destination.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-      destination.sin_port = htons(port);
-      if (connect(fd.get(), reinterpret_cast<sockaddr*>(&destination), sizeof(destination)) != 0) {
-        throw std::runtime_error("connect failed");
-      }
-      const auto command = bts::encode_submit_command(
-          {"net-" + std::to_string(index), static_cast<int>(index % 5U), 1, "payload"});
-      bts::SerialFrame frame{0x31U, std::vector<std::uint8_t>(command.begin(), command.end())};
-      const auto bytes = bts::encode_frame(frame);
-      const std::size_t split = std::min<std::size_t>(3, bytes.size());
-      send_all(fd.get(), bytes, 0, split);
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      send_all(fd.get(), bytes, split, bytes.size());
-    });
-  }
-  for (auto& sender : senders) {
-    sender.join();
+    Fd fd(socket(AF_INET, SOCK_STREAM, 0));
+    if (fd.get() < 0) {
+      throw std::runtime_error("client socket failed");
+    }
+    sockaddr_in destination{};
+    destination.sin_family = AF_INET;
+    destination.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    destination.sin_port = htons(port);
+    if (connect(fd.get(), reinterpret_cast<sockaddr*>(&destination), sizeof(destination)) != 0) {
+      throw std::runtime_error("connect failed");
+    }
+    const auto command = bts::encode_submit_command(
+        {"net-" + std::to_string(index), static_cast<int>(index % 5U), 1, "payload"});
+    bts::SerialFrame frame{0x31U, std::vector<std::uint8_t>(command.begin(), command.end())};
+    const auto bytes = bts::encode_frame(frame);
+    const std::size_t split = std::min<std::size_t>(3, bytes.size());
+    send_all(fd.get(), bytes, 0, split);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    send_all(fd.get(), bytes, split, bytes.size());
   }
   acceptor.join();
 
