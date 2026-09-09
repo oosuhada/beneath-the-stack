@@ -8,7 +8,7 @@ machine-readable evidence is committed as:
 
 | Field | v0.6 value |
 | --- | --- |
-| Source commit measured | `b8eb07da11dea80516e24c94462c5dcc04899a1f` |
+| Source commit measured | `26a638c13996afdbaeb2d2c06b01ca0bdbe2ad64` |
 | Executable labs | 19 |
 | Normalized benchmark records | 56 |
 
@@ -36,15 +36,15 @@ scalability.
 
 | Clients | Accepted jobs | Frames | Bytes received | Partial reads | Elapsed | Throughput |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 1 | 1 | 21 | 2 | 5.348 ms | 186.984 jobs/s |
-| 10 | 10 | 10 | 210 | 20 | 47.515 ms | 210.460 jobs/s |
-| 100 | 100 | 100 | 2,190 | 200 | 429.009 ms | 233.096 jobs/s |
+| 1 | 1 | 1 | 21 | 2 | 4.762 ms | 210.011 jobs/s |
+| 10 | 10 | 10 | 210 | 20 | 49.873 ms | 200.511 jobs/s |
+| 100 | 100 | 100 | 2,190 | 200 | 402.443 ms | 248.482 jobs/s |
 
 | Benchmark | p50 |
 | --- | ---: |
-| Protocol parse loop | 0.151 ms |
-| Failure/recovery campaign | 0.869 ms |
-| 10-client loopback TCP campaign | 52.014 ms |
+| Protocol parse loop | 0.155 ms |
+| Failure/recovery campaign | 0.763 ms |
+| 10-client loopback TCP campaign | 48.496 ms |
 
 Two capstone measurements were rejected before this release evidence was committed:
 

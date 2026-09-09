@@ -22,7 +22,7 @@ artifact should not be treated as finished evidence.
 
 | Field | Value |
 | --- | --- |
-| Source commit measured | `b8eb07da11dea80516e24c94462c5dcc04899a1f` |
+| Source commit measured | `26a638c13996afdbaeb2d2c06b01ca0bdbe2ad64` |
 | Evidence files | `evidence/v0.6-macbook-air.json`, `evidence/v0.6-macbook-air.csv`, `evidence/v0.6-capstone-campaign.json` |
 | Labs | 19 |
 | Normalized benchmark records | 56 |
