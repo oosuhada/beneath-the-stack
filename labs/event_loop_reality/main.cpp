@@ -247,10 +247,6 @@ ServerResult run_event_loop(const Workload& workload) {
   std::size_t read_calls = 0;
   std::size_t open = pairs.size();
   std::vector<char> buffer(64);
-  auto is_open = [&](int fd) {
-    return std::any_of(pairs.begin(), pairs.end(),
-                       [&](const Pair& pair) { return pair.server == fd; });
-  };
   auto mark_closed = [&](int fd) {
     for (auto& pair : pairs) {
       if (pair.server == fd) {
@@ -262,6 +258,10 @@ ServerResult run_event_loop(const Workload& workload) {
   };
 
 #ifdef __APPLE__
+  auto is_open = [&](int fd) {
+    return std::any_of(pairs.begin(), pairs.end(),
+                       [&](const Pair& pair) { return pair.server == fd; });
+  };
   const int queue = ::kqueue();
   if (queue < 0) {
     fail_errno("kqueue failed");
@@ -315,7 +315,7 @@ ServerResult run_event_loop(const Workload& workload) {
   std::vector<pollfd> fds;
   fds.reserve(pairs.size());
   for (const auto& pair : pairs) {
-    fds.push_back(pollfd{pair.server, POLLIN | POLLHUP, 0});
+    fds.push_back(pollfd{pair.server, static_cast<short>(POLLIN | POLLHUP), static_cast<short>(0)});
   }
   while (open > 0) {
     const int ready = ::poll(fds.data(), fds.size(), -1);
