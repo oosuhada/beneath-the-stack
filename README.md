@@ -32,6 +32,13 @@ real product application
 This is not a coding-test solution archive and it is not a dashboard project. The browser UI is an
 observer. The C++ implementations, POSIX experiments, tests and versioned evidence are the project.
 
+## Portfolio evidence preview
+
+![beneath-the-stack dashboard overview](docs/portfolio/beneath-stack-dashboard.png)
+
+The dashboard is a quick map of the evidence, but the interview value is in the underlying source,
+tests, traces, benchmarks, and defense notes.
+
 ## v0.3 — from examples to investigations
 
 v0.3 is not a topic-expansion sprint. It records the work that is harder to fake: predictions,
