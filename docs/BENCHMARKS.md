@@ -1,3 +1,48 @@
+# v0.5 firmware-boundary evidence
+
+v0.5 is a simulator-first embedded/firmware track. The MacBook Air hardware probe did not detect a
+Pico, ESP32, Arduino or USB serial adapter, so this benchmark must not be read as physical MCU timing.
+It measures deterministic host-side firmware architecture: bounded buffers, protocol parsing,
+periodic scheduler behavior, state-machine fault handling and simulated MMIO.
+
+Raw evidence:
+
+- [`evidence/v0.5-macbook-air.json`](../evidence/v0.5-macbook-air.json)
+- [`evidence/v0.5-macbook-air.csv`](../evidence/v0.5-macbook-air.csv)
+- [`evidence/hardware/v0.5-macbook-air-probe.txt`](../evidence/hardware/v0.5-macbook-air-probe.txt)
+
+| Field | v0.5 value |
+| --- | --- |
+| Source commit measured | `b2d14c1c12a9ee5f94acf40632092598db1b7fd5` |
+| Executable labs | 18 |
+| Normalized benchmark records | 53 |
+| Physical MCU detected | no |
+
+## v0.5 selected firmware observations
+
+| Track | Observation | Interpretation |
+| --- | --- | --- |
+| Hardware probe | no Pico/ESP32/Arduino/USB-serial keyword detected | simulator-only; no board flashing or GPIO/UART timing claim |
+| State machine | `IDLE -> ARMED -> ACTIVE -> FAULT -> RECOVERY -> IDLE` | capstone includes actuator-active path, injected fault and recovery |
+| Polling vs event | polling mean latency **469.833 us**, max **990 us**; event model fixed at **35 us** | polling latency depends on polling interval; event-like dispatch can lower response latency but needs ISR discipline |
+| Ring buffer | 12 bytes into 8-byte buffer: reject policy rejected **4**, overwrite policy overwrote **4** | overflow behavior is a product/protocol decision, not an implementation detail |
+| Serial protocol | one valid frame, one checksum error, one oversized payload, one timeout reset | parser handles corruption, oversized input and truncated packet timeout |
+| Cooperative scheduler | 100 ms `flash-write` task with 130 ms WCET overran **2** times; sensor task had **127 ms** max jitter and **14** deadline misses | one long cooperative task can damage short periodic tasks |
+| Resource budget | 256-byte static ring, 32-byte max payload, 64 KiB budget, within budget | the lab keeps a declared memory budget instead of allocating without bound |
+| Simulated MMIO | register digest **34**, bit-mask operations used | models flags/register access but does not touch real device registers |
+
+Measured benchmark p50 values for the two timed firmware sections:
+
+| Benchmark | p50 |
+| --- | ---: |
+| `serial-protocol-parse` | 0.204 ms |
+| `cooperative-scheduler-sim` | 0.002 ms |
+
+These numbers are not firmware performance claims. They make the experiment repeatable and expose
+the amount of host-side work done by the parser and simulator.
+
+---
+
 # v0.3 benchmark evidence
 
 The v0.3 snapshot emphasizes failure modes and scaling observations rather than only one-off
