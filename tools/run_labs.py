@@ -71,6 +71,8 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
             "firmware_boundary_lab": ["--warmup", "1", "--repetitions", "2"],
             "embedded_lab": ["--warmup", "1", "--repetitions", "3"],
             "durable_job_runtime_lab": ["--clients", "5", "--max-clients", "20", "--warmup", "0", "--repetitions", "1"],
+            "event_loop_reality_lab": ["--clients", "8", "--bytes", "64", "--slow-first-ms", "5"],
+            "debugging_case_lab": [],
         }
     return {
         "hash_lab": [],
@@ -92,6 +94,8 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
         "firmware_boundary_lab": [],
         "embedded_lab": [],
         "durable_job_runtime_lab": [],
+        "event_loop_reality_lab": [],
+        "debugging_case_lab": [],
     }
 
 

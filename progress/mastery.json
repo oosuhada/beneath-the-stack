@@ -104,16 +104,19 @@
         {"topic": "fixed-row serialization", "level": 4, "artifacts": ["include/bts/toy_storage.hpp", "tests/mastery_tests.cpp", "labs/storage_engine/main.cpp", "docs/interview/storage-engine.md"]},
         {"topic": "4 KiB page / pager", "level": 5, "artifacts": ["include/bts/toy_storage.hpp", "tests/mastery_tests.cpp", "labs/storage_engine/main.cpp", "docs/interview/storage-engine.md", "https://github.com/oosuhada/browser-reliability-runtime/blob/main/src/local-llm/queue.ts"]},
         {"topic": "persisted index rebuild", "level": 4, "artifacts": ["include/bts/toy_storage.hpp", "tests/mastery_tests.cpp", "labs/storage_engine/main.cpp"]},
-        {"topic": "PostgreSQL source bridge", "level": 2, "artifacts": ["docs/source-reading/postgres-pages-btree.md", "docs/notebook/2026-09-08-storage-page-index-scaling.md"]},
-        {"topic": "PostgreSQL EXPLAIN / BUFFERS", "level": 1, "artifacts": ["docs/ROADMAP.md", "docs/applied-concepts.md"]},
-        {"topic": "MVCC / isolation / WAL", "level": 0, "artifacts": []}
+        {"topic": "PostgreSQL source bridge", "level": 3, "defense_status": "implemented", "artifacts": ["docs/source-reading/postgres-pages-btree.md", "docs/source-reading/postgres-mvcc-lock-buffer-wal.md", "docs/notebook/2026-09-08-storage-page-index-scaling.md"]},
+        {"topic": "PostgreSQL EXPLAIN / BUFFERS", "level": 4, "defense_status": "defended", "artifacts": ["tools/run_postgres_reality.py", "evidence/v0.7-postgres-reality.json", "docs/reality/v0.7-real-systems-validation.md"]},
+        {"topic": "PostgreSQL MVCC / lock wait / deadlock", "level": 4, "defense_status": "defended", "artifacts": ["tools/run_postgres_reality.py", "evidence/v0.7-postgres-reality.json", "docs/source-reading/postgres-mvcc-lock-buffer-wal.md"]},
+        {"topic": "PostgreSQL WAL LSN observation", "level": 4, "defense_status": "defended", "artifacts": ["tools/run_postgres_reality.py", "evidence/v0.7-postgres-reality.json", "docs/source-reading/postgres-mvcc-lock-buffer-wal.md"]},
+        {"topic": "production MVCC/WAL implementation", "level": 1, "artifacts": ["docs/source-reading/postgres-mvcc-lock-buffer-wal.md"]}
       ]
     },
     {
       "name": "Systems Programming",
       "topics": [
         {"topic": "C++20 low-level lab runtime", "level": 4, "artifacts": ["Makefile", "CMakeLists.txt", "tests/system_tests.cpp", "tests/mastery_tests.cpp", "tools/run_labs.py"]},
-        {"topic": "async I/O / event loop", "level": 1, "artifacts": ["docs/applied-concepts.md", "docs/ROADMAP.md"]},
+        {"topic": "async I/O / event loop", "level": 4, "defense_status": "defended", "artifacts": ["labs/event_loop_reality/main.cpp", "docs/adr/ADR-018-event-loop-reality-check.md", "docs/reality/v0.7-real-systems-validation.md"]},
+        {"topic": "sanitizer debugging case study", "level": 3, "defense_status": "implemented", "artifacts": ["labs/debugging_case/main.cpp", "tools/run_debugging_case.sh", "docs/debugging-v0.7.md", "evidence/debugger/v0.7-debugging-case-summary.json"]},
         {"topic": "compiler / token-AST-machine bridge", "level": 1, "artifacts": ["docs/REFERENCES.md", "docs/ROADMAP.md"]}
       ]
     },

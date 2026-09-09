@@ -148,6 +148,34 @@ See [`docs/capstone/durable-job-runtime.md`](docs/capstone/durable-job-runtime.m
 [`docs/defense/`](docs/defense/), [`docs/audit/v0.6-mastery-audit.md`](docs/audit/v0.6-mastery-audit.md)
 and [`EVIDENCE.md`](EVIDENCE.md).
 
+## v0.7 — reality check
+
+v0.7 does not add another toy system. It checks the remaining gap between controlled experiments and
+real runtimes.
+
+```text
+toy storage/index/recovery
+  -> real PostgreSQL planner, buffers, MVCC, locks and WAL position
+
+blocking/threaded sockets
+  -> kqueue event loop on macOS
+
+generated/fixed code
+  -> sanitizer-backed debugging case study
+```
+
+New v0.7 evidence:
+
+- `tools/run_postgres_reality.py` creates a disposable PostgreSQL database and records real
+  `EXPLAIN (ANALYZE, BUFFERS)`, MVCC visibility, lock timeout, deadlock and WAL LSN observations.
+- `labs/event_loop_reality/main.cpp` compares blocking serial reads, thread-per-client reads and a
+  macOS `kqueue` event loop on one socketpair workload. Linux CI builds the same lab through a poll
+  fallback, but does not claim kqueue timing.
+- `tools/run_debugging_case.sh` attempts ASan use-after-free evidence and captures UBSan signed
+  overflow evidence with source-line output.
+- [`docs/reality/v0.7-real-systems-validation.md`](docs/reality/v0.7-real-systems-validation.md)
+  records what was validated and what is still not claimed.
+
 ## v0.2 — from labs to an evidence graph
 
 v0.1 established six executable experiments. v0.2 keeps those and adds the missing bridges between
@@ -195,7 +223,7 @@ No third-party C++ data-structure or benchmark framework is required for these l
 
 ## Executable laboratories
 
-Nineteen binaries emit machine-readable JSON. `tools/run_labs.py` only orchestrates them; it does not
+Twenty-one binaries emit machine-readable JSON. `tools/run_labs.py` only orchestrates them; it does not
 manufacture algorithm results.
 
 ```text
@@ -218,6 +246,8 @@ toy-filesystem      path → directory entry → inode-like metadata → fixed-s
 firmware-boundary   HAL · ring buffer · serial protocol · scheduler jitter · simulated MMIO
 embedded-simulator  simulated sensor event → state machine → digital output
 durable-job-runtime TCP frame → parser → bounded queue → journal → recovery
+event-loop-reality blocking vs threaded vs kqueue/poll socket reads
+debugging-case      disabled fault fixtures + safe fixed path
 ```
 
 ## Evidence, not a leaderboard
