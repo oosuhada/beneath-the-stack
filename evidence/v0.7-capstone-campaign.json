@@ -7,10 +7,10 @@
         "accepted": 10,
         "bytes_received": 210,
         "clients": 10,
-        "elapsed_ms": 43.661,
+        "elapsed_ms": 50.0805,
         "frames": 10,
         "partial_reads": 20,
-        "throughput_jobs_per_sec": 229.038
+        "throughput_jobs_per_sec": 199.679
       },
       "name": "normal",
       "passed": true
@@ -64,15 +64,15 @@
         "accepted": 100,
         "bytes_received": 2190,
         "clients": 100,
-        "elapsed_ms": 442.703,
+        "elapsed_ms": 570.633,
         "frames": 100,
         "partial_reads": 200,
-        "throughput_jobs_per_sec": 225.885
+        "throughput_jobs_per_sec": 175.244
       },
       "name": "slow-consumer-pressure",
       "passed": true
     }
   ],
   "schema_version": 1,
-  "source_commit": "f14385e06512312e4641153a1dd1ae7c7b2c47a9"
+  "source_commit": "9382e5f0900d57dd7713baa0e8d554e9af5f91dc"
 }

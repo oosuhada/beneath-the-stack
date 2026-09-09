@@ -12,7 +12,7 @@ committed as:
 
 | Field | v0.7 value |
 | --- | --- |
-| Source commit measured | `f14385e06512312e4641153a1dd1ae7c7b2c47a9` |
+| Source commit measured | `9382e5f0900d57dd7713baa0e8d554e9af5f91dc` |
 | Executable labs | 21 |
 | Normalized benchmark records | 56 |
 | PostgreSQL version | PostgreSQL 18.4 Homebrew on aarch64-apple-darwin25.4.0 |
@@ -39,9 +39,9 @@ network throughput claims.
 
 | Mode | Backend | Clients | Bytes | Read calls | Elapsed | Throughput |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| blocking serial | none | 32 | 4,096 | 70 | 30.469 ms | 134,430 B/s |
-| thread per client | pthread | 32 | 4,096 | 249 | 99.334 ms | 41,235 B/s |
-| event loop | kqueue | 32 | 4,096 | 256 | 96.354 ms | 42,510 B/s |
+| blocking serial | none | 32 | 4,096 | 70 | 27.250 ms | 150,312 B/s |
+| thread per client | pthread | 32 | 4,096 | 256 | 38.188 ms | 107,258 B/s |
+| event loop | kqueue | 32 | 4,096 | 256 | 103.015 ms | 39,761 B/s |
 
 The important result is not “kqueue is always faster.” In this small socketpair workload, blocking
 serial won the elapsed time because the delayed peer and tiny payload dominate. The stronger claim is

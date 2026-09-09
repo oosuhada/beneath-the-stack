@@ -37,7 +37,7 @@ artifact should not be treated as finished evidence.
 
 | Field | Value |
 | --- | --- |
-| Source commit measured | `f14385e06512312e4641153a1dd1ae7c7b2c47a9` |
+| Source commit measured | `9382e5f0900d57dd7713baa0e8d554e9af5f91dc` |
 | Evidence files | `evidence/v0.7-macbook-air.json`, `evidence/v0.7-macbook-air.csv`, `evidence/v0.7-postgres-reality.json`, `evidence/v0.7-capstone-campaign.json`, `evidence/debugger/v0.7-debugging-case-summary.json` |
 | Labs | 21 |
 | Reality checks | PostgreSQL planner/MVCC/locks/WAL, macOS kqueue/poll event-loop lab, sanitizer debugging case |

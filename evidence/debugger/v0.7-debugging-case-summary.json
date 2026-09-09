@@ -13,7 +13,7 @@
     "value": 3
   },
   "root_cause": "debugging fixtures preserve a concrete symptom -> sanitizer report -> source-level fix path; UAF reads after delete[], overflow exceeds int range before a scheduler-like score can be compared safely",
-  "source_commit": "f14385e06512312e4641153a1dd1ae7c7b2c47a9",
+  "source_commit": "9382e5f0900d57dd7713baa0e8d554e9af5f91dc",
   "ubsan": {
     "buggy_exit_status": 134,
     "detected_signed_integer_overflow": true,
