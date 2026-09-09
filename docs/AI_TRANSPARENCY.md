@@ -41,3 +41,20 @@ be worse engineering.
 - `evidence/assembly/allocator-O0.s` and `evidence/assembly/allocator-O2.s` record local compiler
   output so optimization claims can be checked.
 - Product repositories contain actual code changes, not only links back to this repository.
+
+## v0.6 workflow transparency
+
+The capstone was AI-assisted, but the acceptance criteria are repository artifacts rather than chat
+confidence:
+
+- Generated code had to compile with warnings as errors.
+- A claim was revised when the first failure campaign did not actually leave a job in `RUNNING`
+  state before recovery.
+- The queue policy was documented as rejection, not hidden behind an unbounded container.
+- Physical hardware claims stayed excluded because the MacBook Air probe did not show a Pico, ESP32,
+  Arduino or USB serial board.
+- Product changes are kept as ADRs or narrow code changes, not broad rewrites that would be hard to
+  defend.
+
+The intended signal is not that AI was absent. The signal is that generated output is rejected,
+revised or narrowed when tests, evidence or source-level reasoning do not support the stronger claim.

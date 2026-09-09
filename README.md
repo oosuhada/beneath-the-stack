@@ -123,6 +123,31 @@ New v0.5 evidence:
   connects the same timing/buffer/protocol/state-machine questions to the iBridge Studio display
   pipeline without claiming it is MCU firmware.
 
+## v0.6 — cross-layer capstone
+
+v0.6 stops expanding the topic list and connects the existing layers into one small defended system:
+`durable-job-runtime`.
+
+```text
+TCP client
+  -> binary frame / parser
+  -> idempotency index
+  -> bounded priority queue
+  -> worker ownership
+  -> append-only journal
+  -> recovery replay
+  -> queryable state
+```
+
+The defended claims are intentionally specific: duplicate request IDs map to one logical job, a full
+queue rejects new distinct work before writing an accepted record, a `RUNNING` job is retried after
+restart, corrupt/truncated journal tails do not mutate state, and partial TCP reads are assembled
+through a bounded buffer before parsing.
+
+See [`docs/capstone/durable-job-runtime.md`](docs/capstone/durable-job-runtime.md),
+[`docs/defense/`](docs/defense/), [`docs/audit/v0.6-mastery-audit.md`](docs/audit/v0.6-mastery-audit.md)
+and [`EVIDENCE.md`](EVIDENCE.md).
+
 ## v0.2 — from labs to an evidence graph
 
 v0.1 established six executable experiments. v0.2 keeps those and adds the missing bridges between
@@ -161,6 +186,7 @@ include/bts/
 ├── scheduler.hpp        FIFO · round-robin · priority · SJF toy scheduler metrics
 ├── toy_filesystem.hpp   directory entries · inode-like metadata · fixed-size blocks
 ├── firmware.hpp         ring buffer · protocol parser · cooperative scheduler · simulated MMIO
+├── durable_job_runtime.hpp TCP-framed job runtime · idempotency · journal replay
 ├── embedded.hpp         HAL boundary · simulated output · thermal state machine
 └── benchmark.hpp        warm-up · repeated samples · p50/p95 · mean/stddev
 ```
@@ -169,7 +195,7 @@ No third-party C++ data-structure or benchmark framework is required for these l
 
 ## Executable laboratories
 
-Eighteen binaries emit machine-readable JSON. `tools/run_labs.py` only orchestrates them; it does not
+Nineteen binaries emit machine-readable JSON. `tools/run_labs.py` only orchestrates them; it does not
 manufacture algorithm results.
 
 ```text
@@ -191,6 +217,7 @@ allocator           metadata · alignment · fragmentation · coalescing failure
 toy-filesystem      path → directory entry → inode-like metadata → fixed-size blocks
 firmware-boundary   HAL · ring buffer · serial protocol · scheduler jitter · simulated MMIO
 embedded-simulator  simulated sensor event → state machine → digital output
+durable-job-runtime TCP frame → parser → bounded queue → journal → recovery
 ```
 
 ## Evidence, not a leaderboard

@@ -10,6 +10,12 @@
   },
   "rule": "Levels are cumulative. Level 5 requires evidence in a real repository outside beneath-the-stack; a toy application inside this repository is not sufficient.",
   "os_level_5_rule": "For OS topics, Level 5 also requires at least four of: source-read, implemented, broken intentionally, debugged/traced, benchmarked, applied, explained.",
+  "defense_status_contract": {
+    "unclaimed": "No evidence yet",
+    "explained": "Can explain the concept but implementation is weak or absent",
+    "implemented": "Implemented and tested in this repository",
+    "defended": "Implementation, failure mode, trade-off, source path and reproduction command are documented"
+  },
   "domains": [
     {
       "name": "Data Structures",
@@ -109,6 +115,16 @@
         {"topic": "C++20 low-level lab runtime", "level": 4, "artifacts": ["Makefile", "CMakeLists.txt", "tests/system_tests.cpp", "tests/mastery_tests.cpp", "tools/run_labs.py"]},
         {"topic": "async I/O / event loop", "level": 1, "artifacts": ["docs/applied-concepts.md", "docs/ROADMAP.md"]},
         {"topic": "compiler / token-AST-machine bridge", "level": 1, "artifacts": ["docs/REFERENCES.md", "docs/ROADMAP.md"]}
+      ]
+    },
+    {
+      "name": "Cross-layer Capstone",
+      "topics": [
+        {"topic": "durable job runtime", "level": 4, "defense_status": "defended", "artifacts": ["include/bts/durable_job_runtime.hpp", "labs/durable_job_runtime/main.cpp", "tests/mastery_tests.cpp", "docs/capstone/durable-job-runtime.md", "docs/defense/07-capstone.md"]},
+        {"topic": "idempotency key / logical exactly-once effect", "level": 4, "defense_status": "defended", "artifacts": ["include/bts/durable_job_runtime.hpp", "tests/mastery_tests.cpp", "docs/adr/ADR-013-capstone-bounded-journaled-runtime.md"]},
+        {"topic": "append-only recovery journal", "level": 4, "defense_status": "defended", "artifacts": ["include/bts/durable_job_runtime.hpp", "labs/durable_job_runtime/main.cpp", "docs/defense/04-storage-and-recovery.md"]},
+        {"topic": "bounded backpressure", "level": 4, "defense_status": "defended", "artifacts": ["include/bts/durable_job_runtime.hpp", "labs/durable_job_runtime/main.cpp", "docs/adr/ADR-014-capstone-backpressure-policy.md"]},
+        {"topic": "loopback TCP framed ingestion", "level": 4, "defense_status": "defended", "artifacts": ["labs/durable_job_runtime/main.cpp", "include/bts/firmware.hpp", "docs/defense/03-networking-and-parser.md"]}
       ]
     },
     {

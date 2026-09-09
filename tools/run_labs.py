@@ -70,6 +70,7 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
             "toy_filesystem_lab": ["--warmup", "1", "--repetitions", "2"],
             "firmware_boundary_lab": ["--warmup", "1", "--repetitions", "2"],
             "embedded_lab": ["--warmup", "1", "--repetitions", "3"],
+            "durable_job_runtime_lab": ["--clients", "5", "--max-clients", "20", "--warmup", "0", "--repetitions", "1"],
         }
     return {
         "hash_lab": [],
@@ -90,6 +91,7 @@ def profile_arguments(profile: str) -> dict[str, list[str]]:
         "toy_filesystem_lab": [],
         "firmware_boundary_lab": [],
         "embedded_lab": [],
+        "durable_job_runtime_lab": [],
     }
 
 

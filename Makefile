@@ -3,7 +3,7 @@ CXXFLAGS ?= -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -pthread
 DEBUG_FLAGS ?= -std=c++20 -O0 -g -Wall -Wextra -Wpedantic -Werror -Iinclude -pthread
 
 BIN_DIR := build/bin
-LABS := hash_lab heap_lab graph_lab race_lab http_lab btree_lab data_structures_lab algorithm_defense_lab memory_lab process_lab os_boundary_lab vm_lab scheduler_lab storage_lab allocator_lab toy_filesystem_lab firmware_boundary_lab embedded_lab
+LABS := hash_lab heap_lab graph_lab race_lab http_lab btree_lab data_structures_lab algorithm_defense_lab memory_lab process_lab os_boundary_lab vm_lab scheduler_lab storage_lab allocator_lab toy_filesystem_lab firmware_boundary_lab embedded_lab durable_job_runtime_lab
 LAB_BINS := $(addprefix $(BIN_DIR)/,$(LABS))
 HEADERS := $(shell find include -type f -name '*.hpp')
 TEST_BINS := $(BIN_DIR)/system_tests $(BIN_DIR)/mastery_tests $(BIN_DIR)/differential_tests
@@ -69,6 +69,9 @@ $(BIN_DIR)/firmware_boundary_lab: labs/firmware_boundary/main.cpp $(HEADERS) | $
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 $(BIN_DIR)/embedded_lab: labs/embedded_sim/main.cpp $(HEADERS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+$(BIN_DIR)/durable_job_runtime_lab: labs/durable_job_runtime/main.cpp $(HEADERS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 $(BIN_DIR)/system_tests: tests/system_tests.cpp $(HEADERS) | $(BIN_DIR)

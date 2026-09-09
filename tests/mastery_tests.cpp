@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -6,6 +7,7 @@
 
 #include "bts/allocator.hpp"
 #include "bts/data_structures.hpp"
+#include "bts/durable_job_runtime.hpp"
 #include "bts/embedded.hpp"
 #include "bts/firmware.hpp"
 #include "bts/http.hpp"
@@ -346,6 +348,52 @@ void test_toy_filesystem() {
                                       "toy filesystem rejects traversal path components");
 }
 
+void test_durable_job_runtime() {
+  const auto journal =
+      (std::filesystem::temp_directory_path() / "bts-capstone-mastery.journal").string();
+  std::error_code ignored;
+  std::filesystem::remove(journal, ignored);
+
+  bts::RuntimeConfig config{};
+  config.queue_capacity = 2;
+  config.retry_delay_ms = 5;
+  bts::DurableJobRuntime runtime(journal, config);
+
+  const auto first = runtime.accept({"req-1", 5, 2, "payload"}, 0);
+  const auto duplicate = runtime.accept({"req-1", 5, 2, "payload"}, 0);
+  const auto second = runtime.accept({"req-2", 1, 1, "payload"}, 0);
+  const auto full = runtime.accept({"req-3", 1, 1, "payload"}, 0);
+  check(first.accepted && duplicate.duplicate && duplicate.job_id == first.job_id,
+        "durable runtime maps a duplicate request id to one logical job");
+  check(second.accepted && full.rejected, "durable runtime rejects excess work at a bounded queue");
+
+  const auto claimed = runtime.claim_next(0, "worker-a");
+  check(claimed.has_value() && claimed->request_id == "req-1",
+        "durable runtime scheduler claims the higher-priority ready job first");
+
+  auto recovered = bts::DurableJobRuntime::recover(journal, config);
+  const auto counters = recovered.counters();
+  check(counters.recovered_running == 1,
+        "durable runtime moves an in-flight job to retry wait during recovery");
+  check(recovered.process_one(100, "worker-b", false),
+        "durable runtime can reprocess a recovered retry job");
+
+  {
+    std::ofstream out(journal, std::ios::app | std::ios::binary);
+    out << "truncated-record";
+  }
+  auto corrupt = bts::DurableJobRuntime::recover(journal, config);
+  check(corrupt.counters().invalid_journal_records == 1,
+        "durable runtime rejects a corrupt journal tail before mutating state");
+  std::filesystem::remove(journal, ignored);
+
+  const auto encoded = bts::encode_submit_command({"req-frame", 3, 1, "body"});
+  check(bts::parse_submit_command(encoded).has_value(),
+        "durable runtime command parser accepts a well-formed submit payload");
+  check(!bts::parse_submit_command("missing-fields").has_value(),
+        "durable runtime command parser rejects malformed input");
+}
+
 }  // namespace
 
 int main() {
@@ -359,6 +407,7 @@ int main() {
   test_firmware_boundary();
   test_scheduler_simulator();
   test_toy_filesystem();
+  test_durable_job_runtime();
   if (failures != 0) {
     std::cerr << failures << " mastery test(s) failed\n";
     return 1;
